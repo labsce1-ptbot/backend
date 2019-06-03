@@ -15,10 +15,9 @@ const userSchema = Schema({
         type: Date,
         default: Date.now()
     },
-    
     endDate: {
         type: Date,
-        default: Date.now()
+        required: true
     }
 });
 
