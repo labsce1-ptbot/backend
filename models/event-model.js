@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userSchema = Schema({
-    slackID: {
-        type: String,
+const eventSchema = Schema({
+    eventId: {
+        type: Number,
         required: true,
         unique: true
     },
-    slackWorkplace: {
+    slackID: {
         type: String,
-        required: true
-    }, 
+        required: true, 
+    },
     startDate: {
         type: Date,
         default: Date.now()
@@ -18,7 +18,11 @@ const userSchema = Schema({
     endDate: {
         type: Date,
         required: true
+    },
+    message: {
+        type: String,
+        required: true
     }
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Event', eventSchema);
