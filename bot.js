@@ -7,7 +7,9 @@
 // Import Botkit's core features
 const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
-
+const database = require("./config/database")({
+  mongoUri: process.env.MONGO_URI
+});
 // Import a platform-specific adapter for slack.
 
 const {
@@ -24,7 +26,8 @@ require("dotenv").config();
 let storage = null;
 if (process.env.MONGO_URI) {
   storage = mongoStorage = new MongoDbStorage({
-    url: process.env.MONGO_URI
+    // url: process.env.MONGO_URI
+    database
   });
 }
 
