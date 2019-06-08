@@ -12,7 +12,7 @@ module.exports = function(controller) {
     const user = {
         '<@UK7L9AYFR>' : true,
     }
-    const users = "<@UK7L9AYFR>"
+    // const users = "<@UK7L9AYFR>"
 
     //Hard coded, but doesn't work as well
     // controller.hears(`${user}`, 'message,direct_message', async(bot, message) => {

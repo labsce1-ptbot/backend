@@ -40,7 +40,7 @@ const adapter = new SlackAdapter({
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   scopes: ["bot"],
-  redirectUri: process.env.redirectUri,
+  // redirectUri: process.env.redirectUri,
 
   // functions required for retrieving team-specific info
   // for use in multi-team apps
@@ -57,7 +57,6 @@ adapter.use(new SlackMessageTypeMiddleware());
 const controller = new Botkit({
   debug: true,
   webhook_uri: "/api/messages",
-  // webhook_uri: "/slack/receive",
 
   adapter: adapter,
 
