@@ -9,8 +9,6 @@ const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
 require("dotenv").config();
 
-const monk = require("monk");
-
 // Import a platform-specific adapter for slack.
 
 const {
@@ -31,8 +29,6 @@ if (process.env.MONGO_URI) {
     collection: "vacation"
   });
 }
-
-// const db = monk(mongoStorage.config);
 
 const adapter = new SlackAdapter({
   // parameters used to secure webhook endpoint
@@ -66,7 +62,7 @@ const controller = new Botkit({
   adapter: adapter,
   storage: mongoStorage
 });
-console.log(controller.monoDB);
+
 if (process.env.cms_uri) {
   controller.usePlugin(
     new BotkitCMSHelper({
