@@ -1,14 +1,14 @@
-const Article = require("../models/event-model");
+const Event = require("../models/event-model");
 
-function add(message) {
-  article = new Article();
-  (article.eventId = message.client_msg_id),
-    (article.slackID = message.user),
-    (article.endDate = Date.now()),
-    (article.message = message.text);
+function add_date(message) {
+  event = new Event();
+  (event.eventId = message.client_msg_id),
+    (event.slackID = message.user),
+    (event.endDate = Date.now()),
+    (event.message = message.text);
 
-  // article.find(message.user);
-  article.save(function(err) {
+  // event.find(message.user);
+  event.save(function(err) {
     if (err) {
       console.log("error", err);
     } else {
@@ -17,4 +17,4 @@ function add(message) {
   });
 }
 
-module.exports = add;
+module.exports = add_date;
