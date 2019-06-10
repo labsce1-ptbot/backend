@@ -7,6 +7,7 @@
 // Import Botkit's core features
 const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
+require("dotenv").config();
 
 // Import a platform-specific adapter for slack.
 
@@ -19,12 +20,13 @@ const {
 const { MongoDbStorage } = require("botbuilder-storage-mongodb");
 
 // Load process.env values from .env file
-require("dotenv").config();
 
-let storage = null;
+// let storage = database;
 if (process.env.MONGO_URI) {
-  storage = mongoStorage = new MongoDbStorage({
-    url: process.env.MONGO_URI
+  mongoStorage = new MongoDbStorage({
+    url: process.env.MONGO_URI,
+    database: "vacation",
+    collection: "vacation"
   });
 }
 
@@ -57,11 +59,8 @@ adapter.use(new SlackMessageTypeMiddleware());
 const controller = new Botkit({
   debug: true,
   webhook_uri: "/api/messages",
-  // webhook_uri: "/slack/receive",
-
   adapter: adapter,
-
-  storage
+  storage: mongoStorage
 });
 
 if (process.env.cms_uri) {
@@ -118,7 +117,7 @@ controller.webserver.get("/install/auth", async (req, res) => {
 });
 
 controller.hears("hello", "message", async (bot, message) => {
-  await bot.reply(message, "Howdy!");
+  await bot.reply(message, "yo!");
 });
 
 let tokenCache = {};
