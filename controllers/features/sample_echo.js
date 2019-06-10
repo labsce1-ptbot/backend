@@ -21,12 +21,12 @@ module.exports = function(controller) {
     // });
 
     //Listen for users and make comparison on user object
-    controller.on('message', async (bot, message) => {
-        const compare = message.incoming_message.channelData.text
-        if (user[compare]) {
-            await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-        }
-    })
+    // controller.on('message', async (bot, message) => {
+    //     const compare = message.incoming_message.channelData.text
+    //     if (user[compare]) {
+    //         await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
+    //     }
+    // })
 
     // Sample_echo
     // controller.on('message', async(bot, message) => {

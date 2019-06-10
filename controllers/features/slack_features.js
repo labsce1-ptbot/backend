@@ -138,80 +138,82 @@ module.exports = function(controller) {
     // });
 
     //Testing block actions
-    controller.on('block_actions', async (bot, message) => {
-        console.log("<-- BOT / Request -->\n", bot);
-        console.log("<-- MESSAGE -->\n", message);
-        console.log("length of actions", message.incoming_message.channelData.actions[0].selected_date)
-        console.log("<----====== For each action ========------->\n", message.incoming_message.channelData.actions.forEach(f => { console.log(f)}));
-        await bot.replyEphemeral(message, `<@${ message.incoming_message.from.id}> has selected ${ message.incoming_message.channelData.actions[0].value }`)
-    })
+    // controller.on('block_actions', async (bot, message) => {
+    //     console.log("<-- BOT / Request -->\n", bot);
+    //     console.log("<-- MESSAGE -->\n", message);
+    //     console.log("length of actions", message.incoming_message.channelData.actions[0].selected_date)
+    //     console.log("<----====== For each action ========------->\n", message.incoming_message.channelData.actions.forEach(f => { console.log(f)}));
+    //     await bot.replyEphemeral(message, `<@${ message.incoming_message.from.id}> has selected ${ message.incoming_message.channelData.actions[0].value }`)
+    // })
 
     // controller.on('block_actions', async (bot, message) => {
     //     if 
     // })
 
-    controller.on('slash_command', async(bot, message) => {
-        if (message.text === 'plain') {
-            await bot.reply(message, 'This is a plain reply');
-        } else if (message.text === 'public') {
-            await bot.replyPublic(message, 'This is a public reply');
-        } else if (message.text === 'private') {
-            await bot.replyPrivate(message, 'This is a private reply');
-        }
+    // controller.on('slash_command', async(bot, message) => {
+    //     if (message.text === 'plain') {
+    //         await bot.reply(message, 'This is a plain reply');
+    //     } else if (message.text === 'public') {
+    //         await bot.replyPublic(message, 'This is a public reply');
+    //     } else if (message.text === 'private') {
+    //         await bot.replyPrivate(message, 'This is a private reply');
+    //     }
 
-        if (message.text === 'schedule') {
-            await bot.replyPrivate(message, {
-                blocks:[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Please select the start and end date of your vacation time."
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "datepicker",
-                                // "initial_date": "2109-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select start date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "datepicker",
-                                // "initial_date": "2019-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select end date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "Submit",
-                                    "emoji": true
-                                },
-                                "style": "primary",
-                                "value": "Submit"
-                            }
+    //     if (message.text === 'schedule') {
+    //         await bot.replyPrivate(message, {
+    //             blocks:[
+    //                 {
+    //                     "type": "section",
+    //                     "text": {
+    //                         "type": "mrkdwn",
+    //                         "text": "Please select the start and end date of your vacation time."
+    //                     }
+    //                 },
+    //                 {
+    //                     "type": "actions",
+    //                     "elements": [
+    //                         {
+    //                             "type": "datepicker",
+    //                             "action_id" : "start-date",
+    //                             // "initial_date": "2109-06-07",
+    //                             "placeholder": {
+    //                                 "type": "plain_text",
+    //                                 "text": "Select start date",
+    //                                 "emoji": true
+    //                             }
+    //                         },
+    //                         {
+    //                             "type": "datepicker",
+    //                             "action_id" : "end-date",
+    //                             // "initial_date": "2019-06-07",
+    //                             "placeholder": {
+    //                                 "type": "plain_text",
+    //                                 "text": "Select end date",
+    //                                 "emoji": true
+    //                             }
+    //                         },
+    //                         {
+    //                             "type": "button",
+    //                             "text": {
+    //                                 "type": "plain_text",
+    //                                 "text": "Submit",
+    //                                 "emoji": true
+    //                             },
+    //                             "style": "primary",
+    //                             "value": "Submit"
+    //                         }
                             
-                        ]
-                    }
-                ]
-            })
-            console.log(message);
-        }
+    //                     ]
+    //                 }
+    //             ]
+    //         })
+    //         console.log(message);
+    //     }
 
-        // set http status
-        // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
+    //     // set http status
+    //     // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
 
-    });
+    // });
 
     controller.on('interactive_message', async (bot, message) => {
 
