@@ -4,9 +4,7 @@
  */
 let mongoDB = require("../../config/db");
 let add_date = require("../../routers/routers");
-// const express = require("express");
-// const app = express();
-// const Article = require("../../models/event-model");
+
 module.exports = function(controller) {
   controller.hears("sample", "message", async (bot, message) => {
     await bot.reply(message, "I heard a sample message.");
