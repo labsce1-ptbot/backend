@@ -42,12 +42,12 @@ module.exports = function(controller) {
   // });
 
   controller.hears("yes", "message", async (bot, message) => {
-    // await bot.reply(message, "hi!");
+    const dbResponse = await add_date(message);
 
-    const yes = await add_date(message);
-
-    // if (add_date(message) == "success") {
-    //   await bot.reply(message, "vacation time scheduled!");
-    // }
+    if ((dbResponse.slackID = message.user)) {
+      await bot.reply(message, "vacation time scheduled!");
+    } else {
+      await bot.reply(message, "Vacation denied!");
+    }
   });
 };
