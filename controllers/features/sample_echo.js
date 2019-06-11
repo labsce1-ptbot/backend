@@ -15,18 +15,11 @@ module.exports = function(controller) {
   };
   const users = "<@UK7L9AYFR>";
 
-<<<<<<< HEAD
-    const user = {
-        '<@UK7L9AYFR>' : true,
-    }
-    // const users = "<@UK7L9AYFR>"
-=======
   //Hard coded, but doesn't work as well
   // controller.hears(`${user}`, 'message,direct_message', async(bot, message) => {
   //     console.log(message)
   //     await bot.reply(message, `${user} is on vacation`);
   // });
->>>>>>> c5bb0b8c1c20d671516636f8f789dffa1000e8a3
 
   //Listen for users and make comparison on user object
   controller.on("message", async (bot, message) => {
@@ -41,20 +34,10 @@ module.exports = function(controller) {
     }
   });
 
-<<<<<<< HEAD
-    //Listen for users and make comparison on user object
-    // controller.on('message', async (bot, message) => {
-    //     const compare = message.incoming_message.channelData.text
-    //     if (user[compare]) {
-    //         await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-    //     }
-    // })
-=======
   // Sample_echo
   // controller.on('message', async(bot, message) => {
   //     await bot.reply(message, `Echo: ${ message.text }`);
   // });
->>>>>>> c5bb0b8c1c20d671516636f8f789dffa1000e8a3
 
   controller.hears("yes", "message", async (bot, message) => {
     const dbResponse = await add_date(message);

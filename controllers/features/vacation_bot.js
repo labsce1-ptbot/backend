@@ -2,6 +2,10 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
+
+var cache = require('../../models/cache');
+let add_date = require("../../routers/routers");
+
 module.exports = function(controller) {
 
     // var cache = {
@@ -13,9 +17,9 @@ module.exports = function(controller) {
     // var cache = {
     //     'UK7L9AYFR' : true
     // }
-    var cache = {
+    // var cache = {
 
-    }
+    // }
 
     var newDate = {
 
@@ -27,54 +31,57 @@ module.exports = function(controller) {
 
     // Response to (any) block actions (in this case) after calling slash commands
     controller.on('block_actions', async (bot, message) => {
-        // console.log("<-- BOT / Request -->\n", bot);
         console.log("<-- MESSAGE -->\n", message);
-        // console.log("length of actions", message.incoming_message.channelData.actions[0].selected_date)
-        // console.log("<----====== For each action ========------->\n", message.incoming_message.channelData.actions.map(f => { console.log(f)}));
-        // await bot.replyEphemeral(message,
-            // `<@${ message.user}> has selected ${ message.actions.selected_date }`)
-        
-        console.log("<========== checking on user ===========>\n", message.user);
-        console.log("<-----=-=-=-=-=- checking on user object =-=-=-=-=------->\n", cache);
-        // console.log("--------------------------blop ------------\n", message.incoming_message.channelData.actions[0]);
-        const users = message.incoming_message.from.id;
-        const test = JSON.stringify(message.incoming_message.from.id);
-        // console.log("---------=-=-=-=-=-= blahblahblah===============\n", users);
-        console.log("channel data user----------:\n", message.incoming_message.from.id);
-        
-        if (message.incoming_message.channelData.actions[0].action_id === 'start-date') {
-            if (message.incoming_message.from.id === cache[`${message.incoming_message.from.id}`]) {
-            // if (message.incoming_message.from.id === cache.users)
-                // cache[`${message.incoming_message.from.id}`].vacation = false;
-                // cache.users.start_date = message.incoming_message.channelData.actions[0].selected_date;
-                newUser.start_date = message.incoming_message.channelData.actions[0].selected_date;
-                console.log("<=========IF=======>\n", newUser);
-                // console.log(cache[`${message.user}`].vacation);
-                console.log(cache.users.start_date);
+
+        // Saving start_date to cache
+        if (message.incoming_message.channelData.actions[0].action_id === 'start_date') {
+            if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
+                newDate[`${message.incoming_message.channelData.actions[0].block_id}`].start_date = message.incoming_message.channelData.actions[0].selected_date;
             } 
             else {
-                cache[`${message.incoming_message.from.id}`] = {
+                newDate[`${message.incoming_message.channelData.actions[0].block_id}`] = {
+                    "userID" : message.incoming_message.from.id,
                     "start_date" : message.incoming_message.channelData.actions[0].selected_date,
                     "end_date" : "",
-                    "message" : "",
-                    // "vacation" : false
                 }
-                // cache.users = message.incoming_message.from.id;
-                // cache.users.vacation = false;
-                // cache.users.start_date = message.incoming_message.channelData.actions[0].selected_date;
-                console.log("<=====ELSE=====>\n", cache);
-                // console.log(cache.users.vacation);
-                // console.log(cache.users.start_date);
             }
         }
-        await bot.replyEphemeral(message, `FIRED OFFFFFFF:  ${message.incoming_message.channelData.actions[0].selected_date}`)
+
+        // Saving end_date to cache
+        if (message.incoming_message.channelData.actions[0].action_id === 'end_date') {
+            if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
+                newDate[`${message.incoming_message.channelData.actions[0].block_id}`].end_date = message.incoming_message.channelData.actions[0].selected_date;
+            } 
+            else {
+                 newDate[`${message.incoming_message.channelData.actions[0].block_id}`] = {
+                    "userID" : message.incoming_message.from.id,
+                    "start_date" : "",
+                    "end_date" : message.incoming_message.channelData.actions[0].selected_date,
+                }
+
+            }
+        }
+
+        if (message.incoming_message.channelData.actions[0].value === 'Submit') {
+            console.log("--------SUBMITTING------\n", newDate);
+            if (newDate[message.incoming_message.channelData.actions[0].block_id].start_date === '' || newDate[message.incoming_message.channelData.actions[0].block_id].end_date === '') {
+                await bot.replyEphemeral(message, "Please select a start and end date");
+            }
+            else {
+                const dbResponse = await add_date(newDate[message.actions[0].block_id]);
+
+                if (dbResponse.slackID = message.user) {
+                    await bot.replyEphemeral(message, "vacation time scheduled!");
+                } else {
+                    await bot.replyEphemeral(message, "Vacation denied!");
+                }
+            }
+        }
+
+        // await bot.replyEphemeral(message, `FIRED OFFFFFFF:  ${message.incoming_message.channelData.actions[0].selected_date}`)
     
-        console.log("-=-=-=-=-=-=- checking on user object after: =-=-=-=-=-=-\n", cache);
+        console.log("-=-=-=-=-=-=- checking on user object after: =-=-=-=-=-=-\n", newDate);
 
-    })
-
-    controller.on('datepicker', async (bot, message) => {
-        await bot.replyEphemeral(message, "Testing");
     })
 
     //Slash command to start vacation bot
@@ -102,7 +109,7 @@ module.exports = function(controller) {
                         "elements": [
                             {
                                 "type": "datepicker",
-                                "action_id" : "start-date",
+                                "action_id" : "start_date",
                                 // "initial_date": "2109-06-07",
                                 "placeholder": {
                                     "type": "plain_text",
@@ -112,7 +119,7 @@ module.exports = function(controller) {
                             },
                             {
                                 "type": "datepicker",
-                                "action_id" : "end-date",
+                                "action_id" : "end_date",
                                 // "initial_date": "2019-06-07",
                                 "placeholder": {
                                     "type": "plain_text",
