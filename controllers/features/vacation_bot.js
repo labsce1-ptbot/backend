@@ -67,6 +67,7 @@ module.exports = function(controller) {
             }
         }
 
+        // Temporarily solution to immediately pull data and save to cache.js
         if (message.incoming_message.channelData.actions[0].value === 'finding') {
             const find = await db.get_date();
             console.log(find);
@@ -79,7 +80,7 @@ module.exports = function(controller) {
                 }
             })
             console.log("<----What's in cache?!?------>\n", cache);
-            await bot.replyPublic(message, `${cache}`);
+            // await bot.replyPublic(message, `${cache}`);
             }
         
     
@@ -173,6 +174,7 @@ module.exports = function(controller) {
 
     })
 
+    // Only respond to '@user' without anything else to it.
     controller.on('message', async (bot, message) => {
         const compare = message.incoming_message.channelData.text.slice(2, -1)
         // /(U|W)(.){8}/   regex for user name
