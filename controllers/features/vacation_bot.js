@@ -70,6 +70,14 @@ module.exports = function(controller) {
         if (message.incoming_message.channelData.actions[0].value === 'finding') {
             const find = await db.get_date();
             console.log(find);
+            find.forEach(obj => {
+                cache[obj.slackID] = {
+                    "start_date" : obj.startDate,
+                    "end_date" : obj.endDate,
+                    "message" : obj.message
+                }
+            })
+            console.log("<----What's in cache?!?------>\n", cache);
 
             }
         

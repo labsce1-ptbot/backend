@@ -1,5 +1,4 @@
 const Event = require("../models/event-model");
-const bot = require("../controllers/bot");
 
 module.exports = {
   add_date : async (message) => {
