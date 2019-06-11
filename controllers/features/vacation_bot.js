@@ -8,32 +8,20 @@ let add_date = require("../../routers/routers");
 
 module.exports = function(controller) {
 
-    // var cache = {
-        // 'UK7L9AYFR' : {
-            // "vacation" : true,
-        // }
-    // }
-
-    // var cache = {
-    //     'UK7L9AYFR' : true
-    // }
-    // var cache = {
-
-    // }
-
+    // Temporarily holding user's input for start/end date
     var newDate = {
 
-    }
+    };
 
     controller.hears('here', async(bot, message) => {
         await bot.replyPrivate(message, `I see you <${message.user}>`)
-    })
+    });
 
     // Response to (any) block actions (in this case) after calling slash commands
     controller.on('block_actions', async (bot, message) => {
         console.log("<-- MESSAGE -->\n", message);
 
-        // Saving start_date to cache
+        // Saving start_date to newDate
         if (message.incoming_message.channelData.actions[0].action_id === 'start_date') {
             if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
                 newDate[`${message.incoming_message.channelData.actions[0].block_id}`].start_date = message.incoming_message.channelData.actions[0].selected_date;
@@ -47,7 +35,7 @@ module.exports = function(controller) {
             }
         }
 
-        // Saving end_date to cache
+        // Saving end_date to newDate
         if (message.incoming_message.channelData.actions[0].action_id === 'end_date') {
             if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
                 newDate[`${message.incoming_message.channelData.actions[0].block_id}`].end_date = message.incoming_message.channelData.actions[0].selected_date;
@@ -61,9 +49,8 @@ module.exports = function(controller) {
 
             }
         }
-
+        // Submit button, it will also check if start or end date value is empty before sending.
         if (message.incoming_message.channelData.actions[0].value === 'Submit') {
-            console.log("--------SUBMITTING------\n", newDate);
             if (newDate[message.incoming_message.channelData.actions[0].block_id].start_date === '' || newDate[message.incoming_message.channelData.actions[0].block_id].end_date === '') {
                 await bot.replyEphemeral(message, "Please select a start and end date");
             }
@@ -72,16 +59,13 @@ module.exports = function(controller) {
 
                 if (dbResponse.slackID = message.user) {
                     await bot.replyEphemeral(message, "vacation time scheduled!");
+                    delete newDate[message.actions[0].block_id];
                 } else {
                     await bot.replyEphemeral(message, "Vacation denied!");
                 }
             }
         }
-
-        // await bot.replyEphemeral(message, `FIRED OFFFFFFF:  ${message.incoming_message.channelData.actions[0].selected_date}`)
     
-        console.log("-=-=-=-=-=-=- checking on user object after: =-=-=-=-=-=-\n", newDate);
-
     })
 
     //Slash command to start vacation bot
