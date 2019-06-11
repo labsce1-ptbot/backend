@@ -63,6 +63,8 @@ const controller = new Botkit({
   storage: mongoStorage
 });
 
+exports.controller = controller;
+
 if (process.env.cms_uri) {
   controller.usePlugin(
     new BotkitCMSHelper({
