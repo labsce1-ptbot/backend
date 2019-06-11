@@ -74,11 +74,12 @@ module.exports = function(controller) {
                 cache[obj.slackID] = {
                     "start_date" : obj.startDate,
                     "end_date" : obj.endDate,
-                    "message" : obj.message
+                    "message" : obj.message,
+                    "vacation" : true
                 }
             })
             console.log("<----What's in cache?!?------>\n", cache);
-
+            await bot.replyPublic(message, `${cache}`);
             }
         
     
@@ -174,19 +175,12 @@ module.exports = function(controller) {
 
     controller.on('message', async (bot, message) => {
         const compare = message.incoming_message.channelData.text.slice(2, -1)
-        // const compare = message.incoming_message.channelData.text;
         // /(U|W)(.){8}/   regex for user name
-        // console.log(message);
-        // await console.log("---------=============COMPARE========--------------\n", cache[compare].vacation);
-        // if (user[][vacation] === null) {
-        //     user[message.incoming_message.channelData.user] = message.incoming_message.channelData.user;
-        //     user[message.incoming_message.channelData.user][vacation] = false;
-        // } else if (user[compare].vacation) {
-        //     await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-        // }
-        // if(cache.compare.vacation) {
-            // await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-        // }
+        // console.log("----------============COMPARE=============---------------\n", compare);
+        // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
+        if(cache[`${compare}`].vacation) {
+            await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation from ${cache[compare].start_date} until ${cache[compare].end_date}`)
+        }
     })
 
 
