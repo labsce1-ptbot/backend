@@ -14,7 +14,7 @@ async function add_date(message) {
 
   // console.log("<-----EVENT------>", event);
 
-  x = await searchDestroy(event);
+  x = await searchConflict(event);
 
   console.log("=======y======x===", x[0]);
   if (x.length === 0) {
@@ -29,7 +29,7 @@ async function add_date(message) {
   return dbResponse;
 }
 
-async function searchDestroy(event) {
+async function searchConflict(event) {
   const y = await Event.find({
     slackID: event.slackID,
     $or: [
