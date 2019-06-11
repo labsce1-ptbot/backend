@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const eventSchema = Schema({
   eventId: {
     type: String,
-    required: true,
+    required: false,
     unique: true
   },
   slackID: {
@@ -12,16 +12,17 @@ const eventSchema = Schema({
     required: true
   },
   startDate: {
-    type: Date,
-    default: Date.now()
+    type: String,
+    // default: Date.now()
+    required: true
   },
   endDate: {
-    type: Date,
+    type: String,
     required: true
   },
   message: {
     type: String,
-    required: true
+    required: false
   }
 });
 
