@@ -4,14 +4,14 @@
  */
 
 var cache = require("../../models/cache");
-let add_date = require("../../routers/routers");
+let db = require("../../routers/routers");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
   var newDate = {};
 
   controller.hears("here", async (bot, message) => {
-    await bot.replyPrivate(message, `I see you <${message.user}>`);
+    await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 
   // Response to (any) block actions (in this case) after calling slash commands
@@ -67,17 +67,33 @@ module.exports = function(controller) {
         newDate[message.incoming_message.channelData.actions[0].block_id]
           .end_date === ""
       ) {
-        await bot.replyEphemeral(message, "Please select a start and end date");
+        await bot.replyPrivate(message, "Please select a start and end date");
       } else {
-        const dbResponse = await add_date(newDate[message.actions[0].block_id]);
+        const dbResponse = await db.add_date(
+          newDate[message.actions[0].block_id]
+        );
 
         if ((dbResponse.slackID = message.user)) {
-          await bot.replyEphemeral(message, "vacation time scheduled!");
+          await bot.replyPrivate(message, "vacation time scheduled!");
           delete newDate[message.actions[0].block_id];
+          console.log(newDate[message.actions[0].block_id]);
         } else {
-          await bot.replyEphemeral(message, "Vacation denied!");
+          await bot.replyPrivate(message, "Vacation denied!");
         }
       }
+    }
+
+    if (message.incoming_message.channelData.actions[0].value === "finding") {
+      const find = await db.get_date();
+      console.log(find);
+      find.forEach(obj => {
+        cache[obj.slackID] = {
+          start_date: obj.startDate,
+          end_date: obj.endDate,
+          message: obj.message
+        };
+      });
+      console.log("<----What's in cache?!?------>\n", cache);
     }
   });
 
@@ -89,6 +105,27 @@ module.exports = function(controller) {
       await bot.replyPublic(message, "This is a public reply");
     } else if (message.text === "private") {
       await bot.replyPrivate(message, "This is a private reply");
+    }
+
+    if (message.text === "testing") {
+      await bot.replyPrivate(message, {
+        blocks: [
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "finding",
+                  emoji: true
+                },
+                value: "finding"
+              }
+            ]
+          }
+        ]
+      });
     }
 
     if (message.text === "schedule") {

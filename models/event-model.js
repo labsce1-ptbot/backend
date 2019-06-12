@@ -7,12 +7,12 @@ const eventSchema = Schema({
     required: true
   },
   startDate: {
-    type: String,
+    type: Date,
     // default: Date.now()
     required: true
   },
   endDate: {
-    type: String,
+    type: Date,
     required: true
   },
   message: {
