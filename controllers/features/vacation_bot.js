@@ -3,154 +3,163 @@
  * Licensed under the MIT License.
  */
 
-var cache = require('../../models/cache');
+var cache = require("../../models/cache");
 let add_date = require("../../routers/routers");
 
 module.exports = function(controller) {
+  // Temporarily holding user's input for start/end date
+  var newDate = {};
 
-    // Temporarily holding user's input for start/end date
-    var newDate = {
+  controller.hears("here", async (bot, message) => {
+    await bot.replyPrivate(message, `I see you <${message.user}>`);
+  });
 
-    };
+  // Response to (any) block actions (in this case) after calling slash commands
+  controller.on("block_actions", async (bot, message) => {
+    console.log("<-- MESSAGE -->\n", message);
 
-    controller.hears('here', async(bot, message) => {
-        await bot.replyPrivate(message, `I see you <${message.user}>`)
-    });
+    // Saving start_date to newDate
+    if (
+      message.incoming_message.channelData.actions[0].action_id === "start_date"
+    ) {
+      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
+        newDate[
+          `${message.incoming_message.channelData.actions[0].block_id}`
+        ].start_date =
+          message.incoming_message.channelData.actions[0].selected_date;
+      } else {
+        newDate[
+          `${message.incoming_message.channelData.actions[0].block_id}`
+        ] = {
+          userID: message.incoming_message.from.id,
+          start_date:
+            message.incoming_message.channelData.actions[0].selected_date,
+          end_date: ""
+        };
+      }
+    }
 
-    // Response to (any) block actions (in this case) after calling slash commands
-    controller.on('block_actions', async (bot, message) => {
-        console.log("<-- MESSAGE -->\n", message);
+    // Saving end_date to newDate
+    if (
+      message.incoming_message.channelData.actions[0].action_id === "end_date"
+    ) {
+      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
+        newDate[
+          `${message.incoming_message.channelData.actions[0].block_id}`
+        ].end_date =
+          message.incoming_message.channelData.actions[0].selected_date;
+      } else {
+        newDate[
+          `${message.incoming_message.channelData.actions[0].block_id}`
+        ] = {
+          userID: message.incoming_message.from.id,
+          start_date: "",
+          end_date:
+            message.incoming_message.channelData.actions[0].selected_date
+        };
+      }
+    }
+    // Submit button, it will also check if start or end date value is empty before sending.
+    if (message.incoming_message.channelData.actions[0].value === "Submit") {
+      if (
+        newDate[message.incoming_message.channelData.actions[0].block_id]
+          .start_date === "" ||
+        newDate[message.incoming_message.channelData.actions[0].block_id]
+          .end_date === ""
+      ) {
+        await bot.replyEphemeral(message, "Please select a start and end date");
+      } else {
+        const dbResponse = await add_date(newDate[message.actions[0].block_id]);
 
-        // Saving start_date to newDate
-        if (message.incoming_message.channelData.actions[0].action_id === 'start_date') {
-            if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-                newDate[`${message.incoming_message.channelData.actions[0].block_id}`].start_date = message.incoming_message.channelData.actions[0].selected_date;
-            } 
-            else {
-                newDate[`${message.incoming_message.channelData.actions[0].block_id}`] = {
-                    "userID" : message.incoming_message.from.id,
-                    "start_date" : message.incoming_message.channelData.actions[0].selected_date,
-                    "end_date" : "",
+        if ((dbResponse.slackID = message.user)) {
+          await bot.replyEphemeral(message, "vacation time scheduled!");
+          delete newDate[message.actions[0].block_id];
+        } else {
+          await bot.replyEphemeral(message, "Vacation denied!");
+        }
+      }
+    }
+  });
+
+  //Slash command to start vacation bot
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "plain") {
+      await bot.reply(message, "This is a plain reply");
+    } else if (message.text === "public") {
+      await bot.replyPublic(message, "This is a public reply");
+    } else if (message.text === "private") {
+      await bot.replyPrivate(message, "This is a private reply");
+    }
+
+    if (message.text === "schedule") {
+      await bot.replyPrivate(message, {
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text:
+                "Please select the start and end date of your vacation time."
+            }
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "datepicker",
+                action_id: "start_date",
+                // "initial_date": "2109-06-07",
+                placeholder: {
+                  type: "plain_text",
+                  text: "Select start date",
+                  emoji: true
                 }
-            }
-        }
-
-        // Saving end_date to newDate
-        if (message.incoming_message.channelData.actions[0].action_id === 'end_date') {
-            if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-                newDate[`${message.incoming_message.channelData.actions[0].block_id}`].end_date = message.incoming_message.channelData.actions[0].selected_date;
-            } 
-            else {
-                 newDate[`${message.incoming_message.channelData.actions[0].block_id}`] = {
-                    "userID" : message.incoming_message.from.id,
-                    "start_date" : "",
-                    "end_date" : message.incoming_message.channelData.actions[0].selected_date,
+              },
+              {
+                type: "datepicker",
+                action_id: "end_date",
+                // "initial_date": "2019-06-07",
+                placeholder: {
+                  type: "plain_text",
+                  text: "Select end date",
+                  emoji: true
                 }
+              },
+              {
+                type: "button",
+                text: {
+                  type: "plain_text",
+                  text: "Submit",
+                  emoji: true
+                },
+                style: "primary",
+                value: "Submit"
+              }
+            ]
+          }
+        ]
+      });
+      console.log(message);
+    }
 
-            }
-        }
-        // Submit button, it will also check if start or end date value is empty before sending.
-        if (message.incoming_message.channelData.actions[0].value === 'Submit') {
-            if (newDate[message.incoming_message.channelData.actions[0].block_id].start_date === '' || newDate[message.incoming_message.channelData.actions[0].block_id].end_date === '') {
-                await bot.replyEphemeral(message, "Please select a start and end date");
-            }
-            else {
-                const dbResponse = await add_date(newDate[message.actions[0].block_id]);
+    // set http status
+    // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
+  });
 
-                if (dbResponse.slackID = message.user) {
-                    await bot.replyEphemeral(message, "vacation time scheduled!");
-                    delete newDate[message.actions[0].block_id];
-                } else {
-                    await bot.replyEphemeral(message, "Vacation denied!");
-                }
-            }
-        }
-    
-    })
-
-    //Slash command to start vacation bot
-    controller.on('slash_command', async(bot, message) => {
-        if (message.text === 'plain') {
-            await bot.reply(message, 'This is a plain reply');
-        } else if (message.text === 'public') {
-            await bot.replyPublic(message, 'This is a public reply');
-        } else if (message.text === 'private') {
-            await bot.replyPrivate(message, 'This is a private reply');
-        }
-
-        if (message.text === 'schedule') {
-            await bot.replyPrivate(message, {
-                blocks:[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Please select the start and end date of your vacation time."
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "datepicker",
-                                "action_id" : "start_date",
-                                // "initial_date": "2109-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select start date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "datepicker",
-                                "action_id" : "end_date",
-                                // "initial_date": "2019-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select end date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "Submit",
-                                    "emoji": true
-                                },
-                                "style": "primary",
-                                "value": "Submit"
-                            }
-                            
-                        ]
-                    }
-                ]
-            })
-            console.log(message);
-        }
-
-        // set http status
-        // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
-
-    })
-
-    controller.on('message', async (bot, message) => {
-        const compare = message.incoming_message.channelData.text.slice(2, -1)
-        // const compare = message.incoming_message.channelData.text;
-        // /(U|W)(.){8}/   regex for user name
-        // console.log(message);
-        // await console.log("---------=============COMPARE========--------------\n", cache[compare].vacation);
-        // if (user[][vacation] === null) {
-        //     user[message.incoming_message.channelData.user] = message.incoming_message.channelData.user;
-        //     user[message.incoming_message.channelData.user][vacation] = false;
-        // } else if (user[compare].vacation) {
-        //     await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-        // }
-        // if(cache.compare.vacation) {
-            // await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
-        // }
-    })
-
-
-
-}
+  controller.on("message", async (bot, message) => {
+    const compare = message.incoming_message.channelData.text.slice(2, -1);
+    // const compare = message.incoming_message.channelData.text;
+    // /(U|W)(.){8}/   regex for user name
+    // console.log(message);
+    // await console.log("---------=============COMPARE========--------------\n", cache[compare].vacation);
+    // if (user[][vacation] === null) {
+    //     user[message.incoming_message.channelData.user] = message.incoming_message.channelData.user;
+    //     user[message.incoming_message.channelData.user][vacation] = false;
+    // } else if (user[compare].vacation) {
+    //     await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
+    // }
+    // if(cache.compare.vacation) {
+    // await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation`)
+    // }
+  });
+};
