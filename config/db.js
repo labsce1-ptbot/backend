@@ -9,7 +9,7 @@ mongoose.connect(url, { useNewUrlParser: false });
 
 // CREATE DATABASE
 
-// Drop seeding
+// Drop table
 db.once('open', () => {
   db.dropCollection("Users", (err, res) => {
     if (err) throw err

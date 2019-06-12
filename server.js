@@ -4,8 +4,12 @@ const express = require('express');
 const app = express();
 const SERVER_CONFIGS = require("./config/server_port.js");
 const botkitRouter = require("./routers/botkitRouter");
-const url = process.env.MONGO_URI
-const mongo = 
+
+// Imported Routers
+const authRoutes = require('./config/auth0.js')
+
+// Routes
+app.use("/auth", authRoutes)
 
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
@@ -15,6 +19,9 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
+app.get("/logged", (req, res) => {
+  res.send("Successfully Worked as far as authenticating")
+})
 
 // Port listener for server
 app.listen(SERVER_CONFIGS.PORT || 5000, error => {
