@@ -75,4 +75,10 @@ module.exports = function(controller) {
   controller.on("block_actions", async (bot, message) => {
     console.log("=======message========", message);
   });
+
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "all") {
+      const x = await showAll(message);
+    }
+  });
 };

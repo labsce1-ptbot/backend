@@ -44,5 +44,11 @@ module.exports = {
 
     console.log("=======conflict_array=========", conflict_array);
     return conflict_array;
+  },
+
+  show_all: async message => {
+    const all_msgs = await Event.find({
+      slackID: event.slackID
+    });
   }
 };
