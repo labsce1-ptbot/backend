@@ -46,6 +46,7 @@ module.exports = function(controller) {
     if (dbResponse[dbResponse.length - 1] === "conflict") {
       dbResponse.pop();
       let conflicts = dbResponse.map(dbRespond => ({
+        response_type: "ephemeral",
         type: "section",
         text: {
           type: "mrkdwn",
