@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const eventSchema = Schema({
-  eventId: {
-    type: String,
-    required: false,
-    unique: true
-  },
   slackID: {
     type: String,
     required: true
