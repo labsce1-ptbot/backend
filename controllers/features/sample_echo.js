@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 // let mongoDB = require("../../config/db");
-let add_date = require("../../routers/routers");
+let db = require("../../routers/routers");
 let moment = require("moment");
 
 module.exports = function(controller) {
@@ -78,7 +78,12 @@ module.exports = function(controller) {
 
   controller.on("slash_command", async (bot, message) => {
     if (message.text === "all") {
-      const x = await showAll(message);
+      const x = await db.showAll(message);
+      if (x.length > 0) {
+        console.log(x);
+      } else {
+        await bot.reply("you have yet to schedule any vacation");
+      }
     }
   });
 };
