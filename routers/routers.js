@@ -14,23 +14,21 @@ async function add_date(message) {
 
   // console.log("<-----EVENT------>", event);
 
-  x = await searchConflict(event);
+  let conflicts = await searchConflict(event);
 
-  console.log("=======y======x===", x[0]);
-  if (x.length === 0) {
+  console.log("=======y======conflicts===", conflicts[0]);
+  if (conflicts.length === 0) {
     return await event.save();
   } else {
-    x.push(event);
-    x.push("conflict");
+    conflicts.push(event);
+    conflicts.push("conflict");
 
-    return x;
+    return conflicts;
   }
-
-  return dbResponse;
 }
 
 async function searchConflict(event) {
-  const y = await Event.find({
+  const conflict_array = await Event.find({
     slackID: event.slackID,
     $or: [
       {
@@ -40,8 +38,8 @@ async function searchConflict(event) {
     ]
   });
 
-  console.log("=======y=========", y);
-  return y;
+  console.log("=======conflict_array=========", conflict_array);
+  return conflict_array;
 }
 
 module.exports = add_date;
