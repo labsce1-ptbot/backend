@@ -180,8 +180,10 @@ module.exports = function(controller) {
         // /(U|W)(.){8}/   regex for user name
         // console.log("----------============COMPARE=============---------------\n", compare);
         // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
-        if(cache[`${compare}`].vacation) {
-            await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation from ${cache[compare].start_date} until ${cache[compare].end_date}`)
+        if (cache[compare].vacation != undefined) {
+            if(cache[`${compare}`].vacation) {
+                await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation from ${cache[compare].start_date} until ${cache[compare].end_date}`)
+            }
         }
     })
 
