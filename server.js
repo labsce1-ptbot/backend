@@ -9,7 +9,9 @@ const app = express();
 
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
-app.use(NodeCron);
+
+// Initialize Node-cron to run when server starts.
+NodeCron();
 
 // Test endpoint to see if server is running
 app.get("/", (req, res) => {
