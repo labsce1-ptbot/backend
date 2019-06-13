@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 // let mongoDB = require("../../config/db");
-let add_date = require("../../routers/routers");
+let db = require("../../routers/routers");
 let moment = require("moment");
 
 module.exports = function(controller) {
@@ -46,6 +46,7 @@ module.exports = function(controller) {
     if (dbResponse[dbResponse.length - 1] === "conflict") {
       dbResponse.pop();
       let conflicts = dbResponse.map(dbRespond => ({
+        response_type: "ephemeral",
         type: "section",
         text: {
           type: "mrkdwn",
@@ -74,5 +75,16 @@ module.exports = function(controller) {
 
   controller.on("block_actions", async (bot, message) => {
     console.log("=======message========", message);
+  });
+
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "all") {
+      const x = await db.showAll(message);
+      if (x.length > 0) {
+        console.log(x);
+      } else {
+        await bot.reply("you have yet to schedule any vacation");
+      }
+    }
   });
 };
