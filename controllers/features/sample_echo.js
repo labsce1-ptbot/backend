@@ -74,7 +74,10 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
-    console.log("=======message========", message);
+    console.log(
+      "=======message========>",
+      message.incoming_message.channelData.actions[0].selected_option.value
+    );
   });
 
   controller.on("slash_command", async (bot, message) => {
@@ -85,11 +88,11 @@ module.exports = function(controller) {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `${moment(dbRespond.startDate).format(
+            text: `*${moment(dbRespond.startDate).format(
               "MMMM DD, YYYY"
-            )} - ${moment(dbRespond.endDate).format(
+            )}* - *${moment(dbRespond.endDate).format(
               "MMMM DD, YYYY"
-            )}\nTo remove this vacation please select delete from the dropdown.`
+            )}*\nTo remove this vacation please select delete from the dropdown.`
           },
           accessory: {
             type: "static_select",
@@ -105,29 +108,31 @@ module.exports = function(controller) {
                   emoji: true,
                   text: "Edit it"
                 },
-                value: "value-0"
+                value: "edit"
               },
               {
                 text: {
                   type: "plain_text",
-                  emoji: true,
+                  emoji: false,
                   text: "Delete"
                 },
-                value: "value-1"
-              },
-              {
-                text: {
-                  type: "plain_text",
-                  emoji: true,
-                  text: "Save"
-                },
-                value: "value-2"
+                value: "delete"
               }
             ]
           }
         }));
-
+        // v.push({
+        //   type: "button",
+        //   text: {
+        //     type: "plain_text",
+        //     text: "Submit",
+        //     emoji: true
+        //   },
+        //   style: "primary",
+        //   value: "nope"
+        // });
         console.log("======v========", v);
+
         await bot.replyPrivate(message, { blocks: v });
       }
     }
