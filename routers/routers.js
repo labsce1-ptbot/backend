@@ -1,15 +1,48 @@
 const Event = require("../models/event-model");
+const db = require("../config/db");
 
-async function add_date(message) {
-  event = new Event();
-  (event.eventId = message.client_msg_id),
-    (event.slackID = message.user),
-    (event.endDate = Date.now()),
-    (event.message = message.text);
+module.exports = {
+  add_date: async message => {
+    console.log("<----------MESSAGE-------->\n", message);
+    console.log("<----Date NOW---->\n", Date.now());
+    event = new Event();
 
-  const dbResponse = await event.save();
+    (event.slackID = message.userID),
+      (event.startDate = message.start_date),
+      (event.endDate = message.end_date),
+      (event.message = "message.text");
 
-  return dbResponse;
-}
+    let conflicts = await searchConflict(event);
+    if (conflicts.length === 0) {
+      return await event.save();
+    } else {
+      conflicts.push(event);
+      conflicts.push("conflict");
 
-module.exports = add_date;
+      return conflicts;
+    }
+  },
+  get_date: async () => {
+    console.log("<---- GET Date NOW---->\n");
+    const y = await Event.find({
+      startDate: { $lte: Date.now() },
+      endDate: { $gte: Date.now() }
+    });
+    return y;
+  },
+
+  searchConflict: async event => {
+    const conflict_array = await Event.find({
+      slackID: event.slackID,
+      $or: [
+        {
+          startDate: { $gte: event.startDate, $lte: event.endDate },
+          endDate: { $gte: event.startDate, $lte: event.endDate }
+        }
+      ]
+    });
+
+    console.log("=======conflict_array=========", conflict_array);
+    return conflict_array;
+  }
+};

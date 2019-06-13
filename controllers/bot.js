@@ -42,7 +42,7 @@ const adapter = new SlackAdapter({
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   scopes: ["bot"],
-  redirectUri: process.env.redirectUri,
+  // redirectUri: process.env.redirectUri,
 
   // functions required for retrieving team-specific info
   // for use in multi-team apps

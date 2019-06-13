@@ -19,9 +19,15 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
+// List All Users
+app.get("/users", (req, res) => {
+})
+
 app.get("/logged", (req, res) => {
   res.send("Successfully Worked as far as authenticating")
 })
+
+
 
 // Port listener for server
 app.listen(SERVER_CONFIGS.PORT || 5000, error => {
