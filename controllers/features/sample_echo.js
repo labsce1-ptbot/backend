@@ -83,6 +83,7 @@ module.exports = function(controller) {
   controller.on("slash_command", async (bot, message) => {
     if (message.text === "all") {
       const x = await db.showAll(message);
+      console.log(x);
       if (x.length > 0) {
         let v = x.map(dbRespond => ({
           type: "section",
@@ -108,15 +109,15 @@ module.exports = function(controller) {
                   emoji: true,
                   text: "Edit it"
                 },
-                value: "edit"
+                value: `edit ${dbRespond._id}`
               },
               {
                 text: {
                   type: "plain_text",
-                  emoji: false,
+                  emoji: true,
                   text: "Delete"
                 },
-                value: "delete"
+                value: `${dbRespond._id}`
               }
             ]
           }
