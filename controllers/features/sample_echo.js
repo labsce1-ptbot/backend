@@ -81,10 +81,56 @@ module.exports = function(controller) {
     if (message.text === "all") {
       const x = await db.showAll(message);
       if (x.length > 0) {
-        console.log(x);
-      } else {
-        await bot.reply("you have yet to schedule any vacation");
+        let v = x.map(dbRespond => ({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text:
+              "*<fakeLink.toYourApp.com|Use Case Catalogue>*\nUse Case Catalogue for the following departments/roles..."
+          },
+          accessory: {
+            type: "static_select",
+            placeholder: {
+              type: "plain_text",
+              emoji: true,
+              text: "Manage"
+            },
+            options: [
+              {
+                text: {
+                  type: "plain_text",
+                  emoji: true,
+                  text: "Edit it"
+                },
+                value: "value-0"
+              },
+              {
+                text: {
+                  type: "plain_text",
+                  emoji: true,
+                  text: "Delete"
+                },
+                value: "value-1"
+              },
+              {
+                text: {
+                  type: "plain_text",
+                  emoji: true,
+                  text: "Save"
+                },
+                value: "value-2"
+              }
+            ]
+          }
+        }));
+
+        console.log("======v========", v);
+        await bot.reply(message, { blocks: v });
       }
     }
   });
 };
+
+// await bot.reply(message, {
+//   blocks: conflicts
+// });
