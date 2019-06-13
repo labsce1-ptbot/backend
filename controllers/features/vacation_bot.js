@@ -5,6 +5,7 @@
 
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
+let moment = require('moment');
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -164,120 +165,6 @@ module.exports = function(controller) {
                   text: "Select end date",
                   emoji: true
                 }
-<<<<<<< HEAD
-            })
-            console.log("<----What's in cache?!?------>\n", cache);
-            // await bot.replyPublic(message, `${cache}`);
-            }
-        
-    
-    })
-
-    //Slash command to start vacation bot
-    controller.on('slash_command', async(bot, message) => {
-        if (message.text === 'plain') {
-            await bot.reply(message, 'This is a plain reply');
-        } else if (message.text === 'public') {
-            await bot.replyPublic(message, 'This is a public reply');
-        } else if (message.text === 'private') {
-            await bot.replyPrivate(message, 'This is a private reply');
-        }
-
-        if (message.text === "testing") {
-            await bot.replyPrivate(message, {
-                blocks: [
-                    {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "finding",
-                                    "emoji": true
-                                },
-                                "value": "finding"
-                            }
-                        ]
-                    }
-                ]
-            })
-        }
-
-
-        if (message.text === 'schedule') {
-            await bot.replyPrivate(message, {
-                blocks:[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Please select the start and end date of your vacation time."
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "datepicker",
-                                "action_id" : "start_date",
-                                // "initial_date": "2109-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select start date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "datepicker",
-                                "action_id" : "end_date",
-                                // "initial_date": "2019-06-07",
-                                "placeholder": {
-                                    "type": "plain_text",
-                                    "text": "Select end date",
-                                    "emoji": true
-                                }
-                            },
-                            {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "Submit",
-                                    "emoji": true
-                                },
-                                "style": "primary",
-                                "value": "Submit"
-                            }
-                            
-                        ]
-                    }
-                ]
-            })
-            console.log(message);
-        }
-
-        // set http status
-        // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
-
-    })
-
-    // Only respond to '@user' without anything else to it.
-    controller.on('message', async (bot, message) => {
-        const compare = message.incoming_message.channelData.text.slice(2, -1)
-        // /(U|W)(.){8}/   regex for user name
-        // console.log("----------============COMPARE=============---------------\n", compare);
-        // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
-        if (cache[compare].vacation != undefined) {
-            if(cache[`${compare}`].vacation) {
-                await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, ${message.incoming_message.channelData.text} is currently on Vacation from ${cache[compare].start_date} until ${cache[compare].end_date}`)
-            }
-        }
-    })
-
-
-
-}
-=======
               },
               {
                 type: "button",
@@ -303,19 +190,18 @@ module.exports = function(controller) {
   // Only respond to '@user' without anything else to it.
   controller.on("message", async (bot, message) => {
     const compare = message.incoming_message.channelData.text.slice(2, -1);
+    const start = moment(cache[compare].start_date).unix();
+    const end = moment(cache[compare].end_date).unix();
     // /(U|W)(.){8}/   regex for user name
     // console.log("----------============COMPARE=============---------------\n", compare);
     // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
     if (cache[`${compare}`].vacation) {
       await bot.replyInThread(
-        message,
+        message, 
         `Hey <@${message.incoming_message.channelData.user}>, ${
           message.incoming_message.channelData.text
-        } is currently on Vacation from ${cache[compare].start_date} until ${
-          cache[compare].end_date
-        }`
+        } is currently on vacation from <!date^${start}^{date_long}|Posted 2014-02-18 6:39:42 AM PST> until <!date^${end}^{date_long}|Posted 2014-02-18 6:39:42 AM PST>`
       );
-    }
-  });
-};
->>>>>>> 1531b796f7c81e0328760de51022e4f2ebbcc8e1
+  }
+});
+} 

@@ -7,20 +7,23 @@ module.exports = {
     console.log("<----Date NOW---->\n", Date.now());
     event = new Event();
 
-    (event.slackID = message.userID),
+      (event.slackID = message.userID),
       (event.startDate = message.start_date),
       (event.endDate = message.end_date),
       (event.message = "message.text");
 
-    let conflicts = await searchConflict(event);
-    if (conflicts.length === 0) {
-      return await event.save();
-    } else {
-      conflicts.push(event);
-      conflicts.push("conflict");
+    // let conflicts = await searchConflict(event);
+    // if (conflicts.length === 0) {
+    //   return await event.save();
+    // } else {
+    //   conflicts.push(event);
+    //   conflicts.push("conflict");
 
-      return conflicts;
-    }
+    //   return conflicts;
+    // }
+    console.log("<-----EVENT------>", event);
+    const dbResponse = await event.save();
+    return dbResponse;
   },
   get_date: async () => {
     console.log("<---- GET Date NOW---->\n");
