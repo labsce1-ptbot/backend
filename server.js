@@ -5,8 +5,17 @@ const app = express();
 const SERVER_CONFIGS = require("./config/server_port.js");
 const botkitRouter = require("./routers/botkitRouter");
 
+const sessionMiddleware = require('./config/session');
+
+
+// Apply session middleware
+sessionMiddleware(app)
+
 // Imported Routers
 const authRoutes = require('./config/auth0.js')
+
+// Models
+const users = require("./models/user-model")
 
 // Routes
 app.use("/auth", authRoutes)
@@ -21,6 +30,9 @@ app.get("/", (req, res) => {
 
 // List All Users
 app.get("/users", (req, res) => {
+  users.find({}, (err, users) => {
+    res.send(users)
+  })
 })
 
 app.get("/logged", (req, res) => {
