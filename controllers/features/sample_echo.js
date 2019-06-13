@@ -86,7 +86,10 @@ module.exports = function(controller) {
           text: {
             type: "mrkdwn",
             text:
-              "*<fakeLink.toYourApp.com|Use Case Catalogue>*\nUse Case Catalogue for the following departments/roles..."
+              moment(dbRespond.startDate).format("MMMM DD, YYYY") +
+              " - " +
+              moment(dbRespond.endDate).format("MMMM DD, YYYY") +
+              "\nUse Case Catalogue for the following departments/roles..."
           },
           accessory: {
             type: "static_select",
