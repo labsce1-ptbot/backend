@@ -85,11 +85,11 @@ module.exports = function(controller) {
           type: "section",
           text: {
             type: "mrkdwn",
-            text:
-              moment(dbRespond.startDate).format("MMMM DD, YYYY") +
-              " - " +
-              moment(dbRespond.endDate).format("MMMM DD, YYYY") +
-              "\nUse Case Catalogue for the following departments/roles..."
+            text: `${moment(dbRespond.startDate).format(
+              "MMMM DD, YYYY"
+            )} - ${moment(dbRespond.endDate).format(
+              "MMMM DD, YYYY"
+            )}\nTo remove this vacation please select delete from the dropdown.`
           },
           accessory: {
             type: "static_select",
@@ -128,7 +128,7 @@ module.exports = function(controller) {
         }));
 
         console.log("======v========", v);
-        await bot.reply(message, { blocks: v });
+        await bot.replyPrivate(message, { blocks: v });
       }
     }
   });

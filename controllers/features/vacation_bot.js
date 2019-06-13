@@ -5,7 +5,7 @@
 
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
-let moment = require('moment');
+let moment = require("moment");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -190,18 +190,20 @@ module.exports = function(controller) {
   // Only respond to '@user' without anything else to it.
   controller.on("message", async (bot, message) => {
     const compare = message.incoming_message.channelData.text.slice(2, -1);
-    const start = moment(cache[compare].start_date).unix();
-    const end = moment(cache[compare].end_date).unix();
+    // const start = moment(cache[compare].start_date).unix();
+    // const end = moment(cache[compare].end_date).unix();
     // /(U|W)(.){8}/   regex for user name
     // console.log("----------============COMPARE=============---------------\n", compare);
     // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
     if (cache[`${compare}`].vacation) {
+      const start = moment(cache[compare].start_date).unix();
+      const end = moment(cache[compare].end_date).unix();
       await bot.replyInThread(
-        message, 
+        message,
         `Hey <@${message.incoming_message.channelData.user}>, ${
           message.incoming_message.channelData.text
         } is currently on vacation from <!date^${start}^{date_long}|Posted 2014-02-18 6:39:42 AM PST> until <!date^${end}^{date_long}|Posted 2014-02-18 6:39:42 AM PST>`
       );
-  }
-});
-} 
+    }
+  });
+};
