@@ -5,11 +5,19 @@ const app = express();
 const SERVER_CONFIGS = require("./config/server_port.js");
 const botkitRouter = require("./routers/botkitRouter");
 
+const cors = require('cors')
 const sessionMiddleware = require('./config/session');
-
+const options = 'http://localhost:3000'
+const compression = require('compression')
 
 // Apply session middleware
 sessionMiddleware(app)
+
+// Apply compression
+app.use(compression())
+
+// Cors
+app.use(cors({origin: options}))
 
 // Imported Routers
 const authRoutes = require('./config/auth0.js')
