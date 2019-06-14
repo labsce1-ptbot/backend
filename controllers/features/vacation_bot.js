@@ -206,4 +206,54 @@ module.exports = function(controller) {
       );
     }
   });
+
+  controller.on("block_actions", async (bot, message) => {
+    if (message.actions[0].text.text === "Delete") {
+      const dbResponse = await db.deleteVacation(message.actions[0].value);
+
+      if (dbResponse > 0) {
+        return await bot.replyPrivate(message, "Booo, Vacation deleted");
+      } else {
+        await bot.replyPrivate(
+          message,
+          "Hmmm, it seems your vacation was not delete. Are you sure you don't want the time off? If so try again"
+        );
+      }
+    }
+  });
+
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "all") {
+      const allMsgs = await db.showAll(message);
+      if (allMsgs.length > 0) {
+        let displayMsgs = allMsgs.map(dbRespond => ({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${moment(dbRespond.startDate).format(
+              "MMMM DD, YYYY"
+            )}* - *${moment(dbRespond.endDate).format(
+              "MMMM DD, YYYY"
+            )}*\nDelete this vacation?`
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Delete"
+            },
+            value: `${dbRespond._id}`,
+            action_id: "button"
+          }
+        }));
+
+        await bot.replyPrivate(message, { blocks: displayMsgs });
+      } else {
+        await bot.replyPrivate(
+          message,
+          "You don't have any vacations scheduled."
+        );
+      }
+    }
+  });
 };
