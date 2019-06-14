@@ -5,7 +5,7 @@ const MongoClient = require("mongodb").MongoClient;
 const url = process.env.MONGO_URI;
 const dbName = "ptbot"
 const db = mongoose.connection
-const seeder = require("mongoose-seed")
+// const seeder = require("mongoose-seed")
 
 
 // Remember to remove later
@@ -26,15 +26,15 @@ var data = [
 ]
 
 // Seed
-  seeder.connect(url, () => {
-    seeder.loadModels(['../models/user-model.js'])
+  // seeder.connect(url, () => {
+  //   seeder.loadModels(['../models/user-model.js'])
   
-    seeder.clearModels(['User'], () => {
-      seeder.populateModels(data, () => {
-        seeder.disconnect()
-      })
-    })
-  })
+  //   seeder.clearModels(['User'], () => {
+  //     seeder.populateModels(data, () => {
+  //       seeder.disconnect()
+  //     })
+  //   })
+  // })
 
 MongoClient.connect(url, function(err, client) {
   if (err) throw err;
