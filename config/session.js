@@ -13,7 +13,7 @@ module.exports = app => {
     }),
     helmet(),
     session({
-      secret: process.env.clientSecret,
+      secret: process.env.secret,
       saveUninitialized: true,
       resave: true,
     }),
