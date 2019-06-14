@@ -233,7 +233,10 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
-    if (message.actions[0].text.text === "Delete") {
+    if (
+      message.actions[0].text != undefined &&
+      message.actions[0].text.text === "Delete"
+    ) {
       const dbResponse = await db.deleteVacation(message.actions[0].value);
 
       if (dbResponse > 0) {
