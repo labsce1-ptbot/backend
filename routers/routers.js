@@ -59,7 +59,8 @@ module.exports = {
     return all_msgs;
   },
 
-  deleteVacation: async message => {
-    const d = await Event.deleteOne({ id: message._id });
+  deleteVacation: async id => {
+    const count = await Event.deleteOne({ _id: `${id}` });
+    return count.n;
   }
 };

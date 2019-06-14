@@ -74,15 +74,25 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
-    console.log("=======message========>", message.actions[0].value);
+    if (message.actions[0].value) {
+      const dbResponse = await db.deleteVacation(message.actions[0].value);
+
+      if (dbResponse > 0) {
+        await bot.replyPrivate(message, "Booo, Vacation deleted");
+      } else {
+        await bot.reply(
+          message,
+          "Hmmm, it seems your vacation was not delete. Are you sure you don't want to go? If so try again"
+        );
+      }
+    }
   });
 
   controller.on("slash_command", async (bot, message) => {
     if (message.text === "all") {
-      const x = await db.showAll(message);
-      console.log(x);
-      if (x.length > 0) {
-        let v = x.map(dbRespond => ({
+      const allMsgs = await db.showAll(message);
+      if (allMsgs.length > 0) {
+        let displayMsgs = allMsgs.map(dbRespond => ({
           // type: "section",
           // text: {
           //   type: "mrkdwn",
@@ -126,7 +136,7 @@ module.exports = function(controller) {
               "MMMM DD, YYYY"
             )}* - *${moment(dbRespond.endDate).format(
               "MMMM DD, YYYY"
-            )}*\Delete this vacation?`
+            )}*\nDelete this vacation?`
           },
           accessory: {
             type: "button",
@@ -137,32 +147,14 @@ module.exports = function(controller) {
             value: `${dbRespond._id}`,
             action_id: "button"
           }
-          // type: "actions",
-          // block_id: "actionblock789",
-          // elements: [
-          //   {
-          //     type: "button",
-          //     text: {
-          //       type: "plain_text",
-          //       text: "Link Button"
-          //     },
-          //     url: "https://api.slack.com/block-kit"
-          //   }
-          // ]
         }));
-        // v.push({
-        //   type: "button",
-        //   text: {
-        //     type: "plain_text",
-        //     text: "Submit",
-        //     emoji: true
-        //   },
-        //   style: "primary",
-        //   value: "nope"
-        // });
-        console.log("======v========", v);
 
-        await bot.replyPrivate(message, { blocks: v });
+        await bot.replyPrivate(message, { blocks: displayMsgs });
+      } else {
+        await bot.replyPrivate(
+          message,
+          "You don't have any vacations scheduled."
+        );
       }
     }
   });
