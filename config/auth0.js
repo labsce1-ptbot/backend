@@ -32,7 +32,7 @@ router.get('/callback',
  
 router.get('/login',
   passport.authenticate('auth0', {}), function (req, res) {
-  res.redirect("/");
+  res.redirect("/logged");
 });
 
 module.exports = router

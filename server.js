@@ -48,7 +48,6 @@ app.get("/logged", (req, res) => {
 })
 
 
-
 // Port listener for server
 app.listen(SERVER_CONFIGS.PORT || 5000, error => {
     if (error) throw error;
