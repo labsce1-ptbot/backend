@@ -5,7 +5,7 @@
 
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
-let moment = require('moment');
+let moment = require("moment");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -214,12 +214,9 @@ module.exports = function(controller) {
 
   // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
+
     // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`)
-
-    // if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-    //   await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
-    // }
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       await bot.replyInThread(message, `Hey <@${message.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
