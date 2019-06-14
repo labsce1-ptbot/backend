@@ -18,6 +18,7 @@ module.exports = function(controller) {
   // Response to (any) block actions (in this case) after calling slash commands
   controller.on("block_actions", async (bot, message) => {
     console.log("<-- MESSAGE -->\n", message);
+    console.log("<-- newDate -->\n", newDate);
 
     // Saving start_date to newDate
     if (
@@ -136,11 +137,15 @@ module.exports = function(controller) {
       await bot.replyPrivate(message, {
         blocks: [
           {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text:
-                "Please select the start and end date of your vacation time."
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `Hey <@${message.user}>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`
+            },
+            "accessory": {
+              "type": "image",
+              "image_url": "https://api.slack.com/img/blocks/bkb_template_images/palmtree.png",
+              "alt_text": "plants"
             }
           },
           {
@@ -174,7 +179,27 @@ module.exports = function(controller) {
                   emoji: true
                 },
                 style: "primary",
-                value: "Submit"
+                value: "Submit",
+                confirm: {
+                  "title": {
+                      "type": "plain_text",
+                      "text": "Are you sure?"
+                  },
+                  "text": {
+                      "type": "mrkdwn",
+                      // Trying to output the user selected date
+                      // "text": `Start: ${newDate[message.actions[0].block_id].start_date !== undefined ? newDate[message.actions[0].block_id].start_date : "bleh"} to End: ${newDate[message.actions[0].block_id].end_date !== undefined ? newDate[message.actions[0].block_id].end_date : "bleh"}`,
+                      "text": "Please double check the date."
+                  },
+                  "confirm": {
+                      "type": "plain_text",
+                      "text": "Confirm"
+                  },
+                  "deny": {
+                      "type": "plain_text",
+                      "text": "Cancel"
+                  }
+                }
               }
             ]
           }
@@ -189,12 +214,16 @@ module.exports = function(controller) {
 
   // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-    const userRegex = /(U|W)(.){8}/.exec(`${message.incoming_message.channelData.text}`)
+    // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
+    const userRegex = /(U|W)(.){8}/.exec(`${message.text}`)
+
+    // if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
+    //   await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
+    // }
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
+      await bot.replyInThread(message, `Hey <@${message.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
     }
-
 
 });
 } 
