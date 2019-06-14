@@ -93,7 +93,6 @@ module.exports = function(controller) {
           start_date: obj.startDate,
           end_date: obj.endDate,
           message: obj.message,
-          vacation: true
         };
       });
       console.log("<----What's in cache?!?------>\n", cache);
@@ -111,6 +110,7 @@ module.exports = function(controller) {
       await bot.replyPrivate(message, "This is a private reply");
     }
 
+    // Display a button so you can load cache.js with users on vacation for that day, i.e. "/command testing"
     if (message.text === "testing") {
       await bot.replyPrivate(message, {
         blocks: [
@@ -187,21 +187,14 @@ module.exports = function(controller) {
     // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
   });
 
-  // Only respond to '@user' without anything else to it.
+  // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-    const compare = message.incoming_message.channelData.text.slice(2, -1);
-    const start = moment(cache[compare].start_date).unix();
-    const end = moment(cache[compare].end_date).unix();
-    // /(U|W)(.){8}/   regex for user name
-    // console.log("----------============COMPARE=============---------------\n", compare);
-    // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
-    if (cache[`${compare}`].vacation) {
-      await bot.replyInThread(
-        message, 
-        `Hey <@${message.incoming_message.channelData.user}>, ${
-          message.incoming_message.channelData.text
-        } is currently on vacation from <!date^${start}^{date_long}|Posted 2014-02-18 6:39:42 AM PST> until <!date^${end}^{date_long}|Posted 2014-02-18 6:39:42 AM PST>`
-      );
-  }
+    const userRegex = /(U|W)(.){8}/.exec(`${message.incoming_message.channelData.text}`)
+
+    if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
+      await bot.replyInThread(message, `Hey <@${message.incoming_message.channelData.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
+    }
+
+
 });
 } 
