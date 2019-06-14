@@ -74,10 +74,7 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
-    console.log(
-      "=======message========>",
-      message.incoming_message.channelData.actions[0].selected_option.value
-    );
+    console.log("=======message========>", message.actions[0].value);
   });
 
   controller.on("slash_command", async (bot, message) => {
@@ -86,6 +83,42 @@ module.exports = function(controller) {
       console.log(x);
       if (x.length > 0) {
         let v = x.map(dbRespond => ({
+          // type: "section",
+          // text: {
+          //   type: "mrkdwn",
+          //   text: `*${moment(dbRespond.startDate).format(
+          //     "MMMM DD, YYYY"
+          //   )}* - *${moment(dbRespond.endDate).format(
+          //     "MMMM DD, YYYY"
+          //   )}*\nTo remove this vacation please select delete from the dropdown.`
+          // },
+          // accessory: {
+          //   type: "static_select",
+          //   placeholder: {
+          //     type: "plain_text",
+          //     emoji: true,
+          //     text: "Manage"
+          //   },
+          //   options: [
+          //     {
+          //       text: {
+          //         type: "plain_text",
+          //         emoji: true,
+          //         text: "Edit it"
+          //       },
+          //       value: `edit ${dbRespond._id}`
+          //     },
+          //     {
+          //       text: {
+          //         type: "plain_text",
+          //         emoji: true,
+          //         text: "Delete"
+          //       },
+          //       value: `${dbRespond._id}`
+          //     }
+          //   ]
+          // }
+
           type: "section",
           text: {
             type: "mrkdwn",
@@ -93,34 +126,29 @@ module.exports = function(controller) {
               "MMMM DD, YYYY"
             )}* - *${moment(dbRespond.endDate).format(
               "MMMM DD, YYYY"
-            )}*\nTo remove this vacation please select delete from the dropdown.`
+            )}*\Delete this vacation?`
           },
           accessory: {
-            type: "static_select",
-            placeholder: {
+            type: "button",
+            text: {
               type: "plain_text",
-              emoji: true,
-              text: "Manage"
+              text: "Delete"
             },
-            options: [
-              {
-                text: {
-                  type: "plain_text",
-                  emoji: true,
-                  text: "Edit it"
-                },
-                value: `edit ${dbRespond._id}`
-              },
-              {
-                text: {
-                  type: "plain_text",
-                  emoji: true,
-                  text: "Delete"
-                },
-                value: `${dbRespond._id}`
-              }
-            ]
+            value: `${dbRespond._id}`,
+            action_id: "button"
           }
+          // type: "actions",
+          // block_id: "actionblock789",
+          // elements: [
+          //   {
+          //     type: "button",
+          //     text: {
+          //       type: "plain_text",
+          //       text: "Link Button"
+          //     },
+          //     url: "https://api.slack.com/block-kit"
+          //   }
+          // ]
         }));
         // v.push({
         //   type: "button",
