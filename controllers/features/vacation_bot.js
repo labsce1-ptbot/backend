@@ -5,6 +5,7 @@
 
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
+let moment = require("moment");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -17,6 +18,7 @@ module.exports = function(controller) {
   // Response to (any) block actions (in this case) after calling slash commands
   controller.on("block_actions", async (bot, message) => {
     console.log("<-- MESSAGE -->\n", message);
+    console.log("<-- newDate -->\n", newDate);
 
     // Saving start_date to newDate
     if (
@@ -92,7 +94,6 @@ module.exports = function(controller) {
           start_date: obj.startDate,
           end_date: obj.endDate,
           message: obj.message,
-          vacation: true
         };
       });
       console.log("<----What's in cache?!?------>\n", cache);
@@ -110,6 +111,7 @@ module.exports = function(controller) {
       await bot.replyPrivate(message, "This is a private reply");
     }
 
+    // Display a button so you can load cache.js with users on vacation for that day, i.e. "/command testing"
     if (message.text === "testing") {
       await bot.replyPrivate(message, {
         blocks: [
@@ -135,11 +137,15 @@ module.exports = function(controller) {
       await bot.replyPrivate(message, {
         blocks: [
           {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text:
-                "Please select the start and end date of your vacation time."
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": `Hey <@${message.user}>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`
+            },
+            "accessory": {
+              "type": "image",
+              "image_url": "https://api.slack.com/img/blocks/bkb_template_images/palmtree.png",
+              "alt_text": "plants"
             }
           },
           {
@@ -173,7 +179,27 @@ module.exports = function(controller) {
                   emoji: true
                 },
                 style: "primary",
-                value: "Submit"
+                value: "Submit",
+                confirm: {
+                  "title": {
+                      "type": "plain_text",
+                      "text": "Are you sure?"
+                  },
+                  "text": {
+                      "type": "mrkdwn",
+                      // Trying to output the user selected date
+                      // "text": `Start: ${newDate[message.actions[0].block_id].start_date !== undefined ? newDate[message.actions[0].block_id].start_date : "bleh"} to End: ${newDate[message.actions[0].block_id].end_date !== undefined ? newDate[message.actions[0].block_id].end_date : "bleh"}`,
+                      "text": "Please double check the date."
+                  },
+                  "confirm": {
+                      "type": "plain_text",
+                      "text": "Confirm"
+                  },
+                  "deny": {
+                      "type": "plain_text",
+                      "text": "Cancel"
+                  }
+                }
               }
             ]
           }
@@ -186,21 +212,15 @@ module.exports = function(controller) {
     // bot.httpBody({text:'You can send an immediate response using bot.httpBody()'});
   });
 
-  // Only respond to '@user' without anything else to it.
+  // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-    const compare = message.incoming_message.channelData.text.slice(2, -1);
-    // /(U|W)(.){8}/   regex for user name
-    // console.log("----------============COMPARE=============---------------\n", compare);
-    // console.log("---------=============CACHE[COMPARE]========--------------\n", cache[compare]);
-    if (cache[`${compare}`].vacation) {
-      await bot.replyInThread(
-        message,
-        `Hey <@${message.incoming_message.channelData.user}>, ${
-          message.incoming_message.channelData.text
-        } is currently on Vacation from ${cache[compare].start_date} until ${
-          cache[compare].end_date
-        }`
-      );
+
+    // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
+    const userRegex = /(U|W)(.){8}/.exec(`${message.text}`)
+
+    if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
+      await bot.replyInThread(message, `Hey <@${message.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
     }
-  });
-};
+
+});
+} 

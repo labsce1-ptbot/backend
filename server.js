@@ -1,9 +1,11 @@
 require("dotenv").config();
 
-const express = require('express');
-const app = express();
 const SERVER_CONFIGS = require("./config/server_port.js");
 const botkitRouter = require("./routers/botkitRouter");
+const NodeCron = require("./config/node-con");
+const express = require('express');
+
+const app = express();
 
 const cors = require('cors')
 const bodyParser = require('body-parser')
@@ -43,6 +45,9 @@ app.use("/auth", authRoutes)
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
 
+// Initialize Node-cron to run when server starts.
+NodeCron();
+
 // Test endpoint to see if server is running
 app.get("/", (req, res) => {
   res.send("Hello, World!");
@@ -66,6 +71,8 @@ app.get("/check", (req, res) => {
 app.get("/failure", (req, res) => {
   res.send("Failure to authenticate")
 })
+// Testing atm, Trying to get botkit to respond from port 5000
+require('./routers/botkitRouter')(app);
 
 // Port listener for server
 app.listen(SERVER_CONFIGS.PORT || 5000, error => {

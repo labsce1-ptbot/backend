@@ -12,15 +12,19 @@ module.exports = {
       (event.endDate = message.end_date),
       (event.message = "message.text");
 
-    let conflicts = await searchConflict(event);
-    if (conflicts.length === 0) {
-      return await event.save();
-    } else {
-      conflicts.push(event);
-      conflicts.push("conflict");
+    // let conflicts = await searchConflict(event);
+    // if (conflicts.length === 0) {
+    //   return await event.save();
+    // } else {
+    //   conflicts.push(event);
+    //   conflicts.push("conflict");
 
-      return conflicts;
-    }
+    //   return conflicts;
+    // }
+
+    console.log("<-----EVENT------>", event);
+    const dbResponse = await event.save();
+    return dbResponse;
   },
   get_date: async () => {
     console.log("<---- GET Date NOW---->\n");
@@ -44,5 +48,19 @@ module.exports = {
 
     console.log("=======conflict_array=========", conflict_array);
     return conflict_array;
+  },
+
+  showAll: async message => {
+    console.log(message.user);
+    const all_msgs = await Event.find({
+      slackID: message.user
+    });
+    console.log(all_msgs);
+    return all_msgs;
+  },
+
+  deleteVacation: async id => {
+    const count = await Event.deleteOne({ _id: `${id}` });
+    return count.n;
   }
 };

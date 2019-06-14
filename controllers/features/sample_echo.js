@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 // let mongoDB = require("../../config/db");
-let add_date = require("../../routers/routers");
+let db = require("../../routers/routers");
 let moment = require("moment");
 
 module.exports = function(controller) {
@@ -46,6 +46,7 @@ module.exports = function(controller) {
     if (dbResponse[dbResponse.length - 1] === "conflict") {
       dbResponse.pop();
       let conflicts = dbResponse.map(dbRespond => ({
+        response_type: "ephemeral",
         type: "section",
         text: {
           type: "mrkdwn",
@@ -73,6 +74,92 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
-    console.log("=======message========", message);
+    if (message.actions[0].value) {
+      const dbResponse = await db.deleteVacation(message.actions[0].value);
+
+      if (dbResponse > 0) {
+        await bot.replyPrivate(message, "Booo, Vacation deleted");
+      } else {
+        await bot.replyPrivate(
+          message,
+          "Hmmm, it seems your vacation was not delete. Are you sure you don't want to go? If so try again"
+        );
+      }
+    }
+  });
+
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "all") {
+      const allMsgs = await db.showAll(message);
+      if (allMsgs.length > 0) {
+        let displayMsgs = allMsgs.map(dbRespond => ({
+          // type: "section",
+          // text: {
+          //   type: "mrkdwn",
+          //   text: `*${moment(dbRespond.startDate).format(
+          //     "MMMM DD, YYYY"
+          //   )}* - *${moment(dbRespond.endDate).format(
+          //     "MMMM DD, YYYY"
+          //   )}*\nTo remove this vacation please select delete from the dropdown.`
+          // },
+          // accessory: {
+          //   type: "static_select",
+          //   placeholder: {
+          //     type: "plain_text",
+          //     emoji: true,
+          //     text: "Manage"
+          //   },
+          //   options: [
+          //     {
+          //       text: {
+          //         type: "plain_text",
+          //         emoji: true,
+          //         text: "Edit it"
+          //       },
+          //       value: `edit ${dbRespond._id}`
+          //     },
+          //     {
+          //       text: {
+          //         type: "plain_text",
+          //         emoji: true,
+          //         text: "Delete"
+          //       },
+          //       value: `${dbRespond._id}`
+          //     }
+          //   ]
+          // }
+
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${moment(dbRespond.startDate).format(
+              "MMMM DD, YYYY"
+            )}* - *${moment(dbRespond.endDate).format(
+              "MMMM DD, YYYY"
+            )}*\nDelete this vacation?`
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Delete"
+            },
+            value: `${dbRespond._id}`,
+            action_id: "button"
+          }
+        }));
+
+        await bot.replyPrivate(message, { blocks: displayMsgs });
+      } else {
+        await bot.replyPrivate(
+          message,
+          "You don't have any vacations scheduled."
+        );
+      }
+    }
   });
 };
+
+// await bot.reply(message, {
+//   blocks: conflicts
+// });
