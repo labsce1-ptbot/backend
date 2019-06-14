@@ -80,7 +80,7 @@ module.exports = function(controller) {
       if (dbResponse > 0) {
         await bot.replyPrivate(message, "Booo, Vacation deleted");
       } else {
-        await bot.reply(
+        await bot.replyPrivate(
           message,
           "Hmmm, it seems your vacation was not delete. Are you sure you don't want to go? If so try again"
         );
