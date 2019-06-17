@@ -1,7 +1,9 @@
 const Event = require("../models/event-model");
+const User = require("../models/user-model")
 const db = require("../config/db");
 
 module.exports = {
+  // Slack
   add_date: async message => {
     console.log("<----------MESSAGE-------->\n", message);
     console.log("<----Date NOW---->\n", Date.now());
@@ -62,5 +64,31 @@ module.exports = {
   deleteVacation: async id => {
     const count = await Event.deleteOne({ _id: `${id}` });
     return count.n;
+  },
+  // Auth
+  addUser: async profile => {
+
+    if(!profile.sub) {
+      return
+    }
+    
+    // Get the id needed to authenticate user
+    let split = profile.sub.split('|')[1]
+    
+    console.log(split)
+    let user = new User({
+      _id: split,
+      username: profile.nickname,
+      first_name: profile.given_name,
+      last_name: profile.family_name,
+      email: profile.email,
+      picture: profile.picture, 
+    })
+
+    console.log(user)
+
+    const userAdd = await user.save()
+    // return new_user
+    return userAdd
   }
 };

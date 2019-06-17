@@ -12,6 +12,7 @@ module.exports = function(controller) {
   var newDate = {};
 
   controller.hears("here", async (bot, message) => {
+    console.log(message.user)
     await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 

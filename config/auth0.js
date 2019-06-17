@@ -1,16 +1,12 @@
 const express = require('express')
 const router = express.Router();
-const path = require("path")
+const moment = require("moment");
+const User = require("../routers/routers")
 
-require("dotenv").config({path: path.resolve(__dirname, '../.env')})
 
 const Auth0Strategy = require('passport-auth0')
 const passport = require('passport')
 
-const params = (accessToken, refreshToken, extraParams, profile, done) => {
-  console.log(profile)
-  return done(null, profile)
-} 
 
 /* Example of profile 
 Profile {
@@ -45,14 +41,27 @@ passport.use(
     clientID: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     callbackURL: process.env.AUTH0_CALLBACK_URL
-  }, params)
+  },  async (accessToken, refreshToken, extraParams, profile, done) => {
+    profile.accessToken = accessToken
+    profile.refreshtoken = refreshToken
+    profile.expiresIn = extraParams.expires_in
+    profile.expires = moment().add(profile.expiresIn, 's')
+    console.log(profile)
+    let user;
+    try {
+    user = await User.addUser(profile._json);
+    return done(null, user)
+    } catch(err) {
+    return done(err, null)
+    }
+  } )
 )
 
 passport.serializeUser((profile, done) => done(null, profile))
 passport.deserializeUser((profile, done) => done(null, profile))
 
 router.get('/callback',
-  passport.authenticate('auth0', { successRedirect: 'http://localhost:5000/logged', failureRedirect: 'http://localhost:5000/failure' },
+  passport.authenticate('auth0', { successRedirect: 'https://73b44a4f.ngrok.io/logged', failureRedirect: 'https://73b44a4f.ngrok.io/failure' },
   ),
 );
  
