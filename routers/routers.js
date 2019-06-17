@@ -77,7 +77,6 @@ module.exports = {
     
     console.log(split)
     let user = new User({
-      _id: split,
       username: profile.nickname,
       first_name: profile.given_name,
       last_name: profile.family_name,

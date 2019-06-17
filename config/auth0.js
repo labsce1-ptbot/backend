@@ -1,6 +1,6 @@
 const express = require('express')
-const router = express.Router();
-const moment = require("moment");
+const router = express.Router()
+const moment = require("moment")
 const User = require("../routers/routers")
 
 
@@ -42,12 +42,12 @@ passport.use(
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     callbackURL: process.env.AUTH0_CALLBACK_URL
   },  async (accessToken, refreshToken, extraParams, profile, done) => {
+    let user;
     profile.accessToken = accessToken
     profile.refreshtoken = refreshToken
     profile.expiresIn = extraParams.expires_in
     profile.expires = moment().add(profile.expiresIn, 's')
     console.log(profile)
-    let user;
     try {
     user = await User.addUser(profile._json);
     return done(null, user)
@@ -61,7 +61,7 @@ passport.serializeUser((profile, done) => done(null, profile))
 passport.deserializeUser((profile, done) => done(null, profile))
 
 router.get('/callback',
-  passport.authenticate('auth0', { successRedirect: 'https://73b44a4f.ngrok.io/logged', failureRedirect: 'https://73b44a4f.ngrok.io/failure' },
+  passport.authenticate('auth0', { successRedirect: 'https://8be2da9b.ngrok.io/logged', failureRedirect: 'https://8be2da9b.ngrok.io/failure' },
   ),
 );
  
