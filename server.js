@@ -79,9 +79,7 @@ app.get("/failure", (req, res) => {
 require('./routers/botkitRouter')(app);
 
 // Port listener for server
-app.listen(SERVER_CONFIGS.PORT || 5000, error => {
+app.listen(SERVER_CONFIGS.PRODUCTION ? SERVER_CONFIGS.PRODUCTION : SERVER_CONFIGS.PORT, error => {
     if (error) throw error;
-    console.log("Server running on port: " + SERVER_CONFIGS.PORT);
-});
-
-
+    console.log("Server running on port: " + SERVER_CONFIGS.PORT ? SERVER_CONFIGS.PORT : SERVER_CONFIGS.PRODUCTION);
+  });

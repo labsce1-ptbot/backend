@@ -29,7 +29,7 @@ cron.schedule("01 00 * * *", async () => {
 })
 
 // Testing, but it runs every one minute
-// const testing = cron.schedule("* * * * *", async () => {
+// const testing = cron.schedule("* * * * * *", async () => {
 //                     console.log("-------------------------\n");
 //                     console.log("Collecting data from database and saving to cache.js\n");
 //                     const find = await db.get_date();
@@ -40,7 +40,8 @@ cron.schedule("01 00 * * *", async () => {
 //                             "message" : obj.message,
 //                             "vacation" : true
 //                         }, {
-//                             scheduled: true
+//                             scheduled: false,
+//                             timezone: eastern
 //                         }
 //                     })
 //                     console.log("------------------------\n");
@@ -50,3 +51,17 @@ cron.schedule("01 00 * * *", async () => {
 // testing.start();
 
 };
+
+
+/*
+    Each index representation
+     * * * * * *
+     | | | | | |
+     | | | | | day of week
+     | | | | month
+     | | | day of month
+     | | hour
+     | minute
+     second ( optional )
+
+*/

@@ -222,6 +222,20 @@ module.exports = function(controller) {
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       await bot.replyInThread(message, `Hey <@${message.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
     }
-
 });
+
+<<<<<<< HEAD
+=======
+  controller.on("block_actions", async (bot, message) => {
+    if (
+      message.actions[0].text != undefined &&
+      message.actions[0].text.text === "Delete"
+    ) {
+      const dbResponse = await db.deleteVacation(message.actions[0].value);
+>>>>>>> 840b2b40a6c63651cbc6d5d29edcad7e97470b3d
+
+
+
+
+
 } 
