@@ -12,6 +12,7 @@ module.exports = function(controller) {
   var newDate = {};
 
   controller.hears("here", async (bot, message) => {
+    console.log("====here====", message);
     await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 
@@ -70,6 +71,16 @@ module.exports = function(controller) {
           .end_date === ""
       ) {
         await bot.replyPrivate(message, "Please select a start and end date");
+      } else if (
+        newDate[message.incoming_message.channelData.actions[0].block_id]
+          .start_date >
+        newDate[message.incoming_message.channelData.actions[0].block_id]
+          .end_date
+      ) {
+        await bot.replyPrivate(
+          message,
+          `Your vacation ends before it begins :thinking_face: Please check your dates.`
+        );
       } else {
         const dbResponse = await db.add_date(
           newDate[message.actions[0].block_id]
