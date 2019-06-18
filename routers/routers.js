@@ -7,11 +7,12 @@ module.exports = {
     console.log("<----Date NOW---->\n", Date.now());
 
     const date_string = `${message.start_date}T12:59`;
+
     event = new Event();
     (event.slackID = message.userID),
       (event.startDate = date_string),
       (event.endDate = message.end_date),
-      (event.message = "bg");
+      (event.message = "message.txt");
 
     // let conflicts = await searchConflict(event);
     // if (conflicts.length === 0) {
