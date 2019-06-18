@@ -26,77 +26,55 @@ module.exports = function(controller) {
   controller.on("block_actions", async (bot, message) => {
     console.log("<-- MESSAGE -->\n", message);
     console.log("<-- newDate -->\n", newDate);
+    const {
+      block_id,
+      selected_date,
+      action_id,
+      value
+    } = message.incoming_message.channelData.actions[0];
 
     // Saving start_date to newDate
-    if (
-      message.incoming_message.channelData.actions[0].action_id === "start_date"
-    ) {
-      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ].start_date =
-          message.incoming_message.channelData.actions[0].selected_date;
+    if (action_id === "start_date") {
+      if (newDate[block_id]) {
+        newDate[`${block_id}`].start_date = selected_date;
       } else {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ] = {
+        newDate[`${block_id}`] = {
           userID: message.incoming_message.from.id,
-          start_date:
-            message.incoming_message.channelData.actions[0].selected_date,
+          start_date: selected_date,
           end_date: ""
         };
       }
     }
 
     // Saving end_date to newDate
-    if (
-      message.incoming_message.channelData.actions[0].action_id === "end_date"
-    ) {
-      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ].end_date =
-          message.incoming_message.channelData.actions[0].selected_date;
+    if (action_id === "end_date") {
+      if (newDate[block_id]) {
+        newDate[`${block_id}`].end_date = selected_date;
       } else {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ] = {
+        newDate[`${block_id}`] = {
           userID: message.incoming_message.from.id,
           start_date: "",
-          end_date:
-            message.incoming_message.channelData.actions[0].selected_date
+          end_date: selected_date
         };
       }
     }
     // Submit button, it will also check if start or end date value is empty before sending.
-    if (message.incoming_message.channelData.actions[0].value === "Submit") {
+    if (value === "Submit") {
       if (
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .start_date === "" ||
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .end_date === ""
+        newDate[block_id].start_date === "" ||
+        newDate[block_id].end_date === ""
       ) {
         await bot.replyPrivate(message, "Please select a start and end date");
-      } else if (
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .start_date >
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .end_date
-      ) {
+      } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
         const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
-          newDate[message.incoming_message.channelData.actions[0].block_id]
-            .start_date
+          newDate[block_id].start_date
         ).format("MMMM DD, YYYY")}, end: ${moment(
-          newDate[message.incoming_message.channelData.actions[0].block_id]
-            .end_date
+          newDate[block_id].end_date
         ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
-        await bot.replyPrivate(
-          message,
 
-          {
-            blocks: block_helper.schedule_vacay(date_error_msg)
-          }
-        );
+        await bot.replyPrivate(message, {
+          blocks: block_helper.schedule_vacay(date_error_msg)
+        });
       } else {
         const dbResponse = await db.add_date(
           newDate[message.actions[0].block_id]
