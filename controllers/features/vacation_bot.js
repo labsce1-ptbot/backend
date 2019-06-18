@@ -261,7 +261,7 @@ module.exports = function(controller) {
             )}* - *${moment(dbRespond.endDate).format(
               "MMMM DD, YYYY"
             )}*\nDelete this vacation?`
-          },
+          }, 
           accessory: {
             type: "button",
             text: {

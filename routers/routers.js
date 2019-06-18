@@ -67,16 +67,12 @@ module.exports = {
   },
   // Auth
   addUser: async profile => {
-
-    if(!profile.sub) {
-      return
+    let foundUser = User.find({email: profile.email})
+    if(foundUser) {
+      return foundUser;
     }
-    
-    // Get the id needed to authenticate user
-    let split = profile.sub.split('|')[1]
-    
-    console.log(split)
-    let user = new User({
+
+    let newUser = new User({
       username: profile.nickname,
       first_name: profile.given_name,
       last_name: profile.family_name,
@@ -84,9 +80,9 @@ module.exports = {
       picture: profile.picture, 
     })
 
-    console.log(user)
+    console.log(newUser)
 
-    const userAdd = await user.save()
+    let userAdd = await newUser.save()
     // return new_user
     return userAdd
   }

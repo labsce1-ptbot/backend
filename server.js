@@ -30,13 +30,14 @@ app.use(
 
 // Imported Routers
 const authRoutes = require('./config/auth0.js')
+const userRoutes = require("./routers/users/usersRoutes")
 
 // Models
 const users = require("./models/user-model")
 
 // Routes
 app.use("/auth", authRoutes)
-
+app.use("/users", userRoutes)
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
 
@@ -70,6 +71,9 @@ app.get("/check", (req, res) => {
     req.session.views = 1
     res.end('welcome to the session demo. refresh!')
   }
+})
+
+app.get("/", (req, res) => {
 })
 
 app.get("/failure", (req, res) => {
