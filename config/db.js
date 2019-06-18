@@ -8,33 +8,33 @@
 // const seeder = require("mongoose-seed")
 
 
-// Remember to remove later
+// // Remember to remove later
 // mongoose.connect(url)
 
-// CREATE DATABASE
+// // CREATE DATABASE
 // var data = [
 //   {
 //   model: "User",
 //   documents: [
-//     {username: "john", password: "test"},
-//     {username: "alice", password: "test"},
-//     {username: "frank", password: "test"},
-//     {username: "greeny", password: "test"},
-//     {username: "spottyottydopalicious", password: "test"}
+//     {username: "john", password: "test", first_name: "Test", last_name: "Test", email: "test@gmail.com", picture: null},
+//     {username: "alice", password: "test", first_name: "Test", last_name: "Test", email: "test1@gmail.com", picture: null},
+//     {username: "frank", password: "test", first_name: "Test", last_name: "Test", email: "test2@gmail.com", picture: null},
+//     {username: "greeny", password: "test", first_name: "Test", last_name: "Test", email: "test3@gmail.com", picture: null},
+//     {username: "spottyottydopalicious", password: "test", first_name: "Test", "last_name": "Test", email: "test4@gmail.com", picture: null}
 //   ]
 //  }
 // ]
 
-// Seed
-  // seeder.connect(url, () => {
-  //   seeder.loadModels(['../models/user-model.js'])
+// // Seed
+// seeder.connect(url, () => {
+//     seeder.loadModels(['../models/user-model.js'])  
   
-  //   seeder.clearModels(['User'], () => {
-  //     seeder.populateModels(data, () => {
-  //       seeder.disconnect()
-  //     })
-  //   })
-  // })
+//     seeder.clearModels(['User'], () => {
+//       seeder.populateModels(data, () => {
+//         seeder.disconnect()
+//       })
+//     })
+//   })
 
 // MongoClient.connect(url, function(err, client) {
 //   if (err) throw err;

@@ -12,6 +12,7 @@ module.exports = function(controller) {
   var newDate = {};
 
   controller.hears("here", async (bot, message) => {
+    console.log(message.user)
     await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 
@@ -214,27 +215,71 @@ module.exports = function(controller) {
 
   // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-
     // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
-    const userRegex = /(U|W)(.){8}/.exec(`${message.text}`)
+    const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      await bot.replyInThread(message, `Hey <@${message.user}>, <@${userRegex[0]}> is currently on vacation from <!date^${moment(cache[`${userRegex[0]}`].start_date).unix()}^{date_long}|Posted 2014-02-18 PST> until <!date^${moment(cache[`${userRegex[0]}`].end_date).unix()}^{date_long}|Posted 2014-02-18 PST>`)
+      await bot.replyInThread(
+        message,
+        ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+          moment(cache[`${userRegex[0]}`].start_date).unix() +
+          `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+          moment(cache[`${userRegex[0]}`].end_date).unix() +
+          `^{date_long}|Posted 2014-02-18 PST>`
+      );
     }
-});
+  });
 
-<<<<<<< HEAD
-=======
   controller.on("block_actions", async (bot, message) => {
     if (
       message.actions[0].text != undefined &&
       message.actions[0].text.text === "Delete"
     ) {
       const dbResponse = await db.deleteVacation(message.actions[0].value);
->>>>>>> 840b2b40a6c63651cbc6d5d29edcad7e97470b3d
 
+      if (dbResponse > 0) {
+        return await bot.replyPrivate(message, "Booo, Vacation deleted");
+      } else {
+        await bot.replyPrivate(
+          message,
+          "Hmmm, it seems your vacation was not delete. Are you sure you don't want the time off? If so try again"
+        );
+      }
+    }
+  });
 
+  controller.on("slash_command", async (bot, message) => {
+    if (message.text === "all") {
+      const allMsgs = await db.showAll(message);
+      if (allMsgs.length > 0) {
+        let displayMsgs = allMsgs.map(dbRespond => ({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${moment(dbRespond.startDate).format(
+              "MMMM DD, YYYY"
+            )}* - *${moment(dbRespond.endDate).format(
+              "MMMM DD, YYYY"
+            )}*\nDelete this vacation?`
+          }, 
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Delete"
+            },
+            value: `${dbRespond._id}`,
+            action_id: "button"
+          }
+        }));
 
-
-
-} 
+        await bot.replyPrivate(message, { blocks: displayMsgs });
+      } else {
+        await bot.replyPrivate(
+          message,
+          "You don't have any vacations scheduled."
+        );
+      }
+    }
+  });
+};

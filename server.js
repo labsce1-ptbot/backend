@@ -7,10 +7,8 @@ const express = require('express');
 
 const app = express();
 
-const cors = require('cors')
 const bodyParser = require('body-parser')
 const sessionMiddleware = require('./config/session');
-const options = 'http://localhost:3000'
 const compression = require('compression')
 
 
@@ -19,9 +17,6 @@ sessionMiddleware(app)
 
 // Apply compression
 app.use(compression())
-
-// Cors
-app.use(cors({origin: options}))
 
 // For payloads
 app.use(bodyParser.json({limit: '50mb', extended: true}))
@@ -35,13 +30,14 @@ app.use(
 
 // Imported Routers
 const authRoutes = require('./config/auth0.js')
+const userRoutes = require("./routers/users/usersRoutes")
 
 // Models
 const users = require("./models/user-model")
 
 // Routes
 app.use("/auth", authRoutes)
-
+app.use("/users", userRoutes)
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
 
@@ -65,7 +61,19 @@ app.get("/logged", (req, res) => {
 })
 
 app.get("/check", (req, res) => {
-  console.log(req.user)
+  if (req.session.views) {
+    req.session.views++
+    res.setHeader('Content-Type', 'text/html')
+    res.write('<p>views: ' + req.session.views + '</p>')
+    res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>')
+    res.end()
+  } else {
+    req.session.views = 1
+    res.end('welcome to the session demo. refresh!')
+  }
+})
+
+app.get("/", (req, res) => {
 })
 
 app.get("/failure", (req, res) => {
