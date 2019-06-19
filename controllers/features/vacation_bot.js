@@ -3,16 +3,22 @@
  * Licensed under the MIT License.
  */
 
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
+let block_helper = require("../../routers/interactive_blocks");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
   var newDate = {};
 
   controller.hears("here", async (bot, message) => {
-    console.log(message.user)
+    console.log("====here====", message);
     await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 
@@ -20,57 +26,55 @@ module.exports = function(controller) {
   controller.on("block_actions", async (bot, message) => {
     console.log("<-- MESSAGE -->\n", message);
     console.log("<-- newDate -->\n", newDate);
+    const {
+      block_id,
+      selected_date,
+      action_id,
+      value
+    } = message.incoming_message.channelData.actions[0];
 
     // Saving start_date to newDate
-    if (
-      message.incoming_message.channelData.actions[0].action_id === "start_date"
-    ) {
-      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ].start_date =
-          message.incoming_message.channelData.actions[0].selected_date;
+    if (action_id === "start_date") {
+      if (newDate[block_id]) {
+        newDate[`${block_id}`].start_date = selected_date;
       } else {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ] = {
+        newDate[`${block_id}`] = {
           userID: message.incoming_message.from.id,
-          start_date:
-            message.incoming_message.channelData.actions[0].selected_date,
+          start_date: selected_date,
           end_date: ""
         };
       }
     }
 
     // Saving end_date to newDate
-    if (
-      message.incoming_message.channelData.actions[0].action_id === "end_date"
-    ) {
-      if (newDate[message.incoming_message.channelData.actions[0].block_id]) {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ].end_date =
-          message.incoming_message.channelData.actions[0].selected_date;
+    if (action_id === "end_date") {
+      if (newDate[block_id]) {
+        newDate[`${block_id}`].end_date = selected_date;
       } else {
-        newDate[
-          `${message.incoming_message.channelData.actions[0].block_id}`
-        ] = {
+        newDate[`${block_id}`] = {
           userID: message.incoming_message.from.id,
           start_date: "",
-          end_date:
-            message.incoming_message.channelData.actions[0].selected_date
+          end_date: selected_date
         };
       }
     }
     // Submit button, it will also check if start or end date value is empty before sending.
-    if (message.incoming_message.channelData.actions[0].value === "Submit") {
+    if (value === "Submit") {
       if (
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .start_date === "" ||
-        newDate[message.incoming_message.channelData.actions[0].block_id]
-          .end_date === ""
+        newDate[block_id].start_date === "" ||
+        newDate[block_id].end_date === ""
       ) {
         await bot.replyPrivate(message, "Please select a start and end date");
+      } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
+        const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+          newDate[block_id].start_date
+        ).format("MMMM DD, YYYY")}, end: ${moment(
+          newDate[block_id].end_date
+        ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
+
+        await bot.replyPrivate(message, {
+          blocks: block_helper.schedule_vacay(date_error_msg)
+        });
       } else {
         const dbResponse = await db.add_date(
           newDate[message.actions[0].block_id]
@@ -94,7 +98,7 @@ module.exports = function(controller) {
         cache[obj.slackID] = {
           start_date: obj.startDate,
           end_date: obj.endDate,
-          message: obj.message,
+          message: obj.message
         };
       });
       console.log("<----What's in cache?!?------>\n", cache);
@@ -135,76 +139,11 @@ module.exports = function(controller) {
     }
 
     if (message.text === "schedule") {
+      const new_message = `Hey <@${
+        message.user
+      }>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`;
       await bot.replyPrivate(message, {
-        blocks: [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": `Hey <@${message.user}>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`
-            },
-            "accessory": {
-              "type": "image",
-              "image_url": "https://api.slack.com/img/blocks/bkb_template_images/palmtree.png",
-              "alt_text": "plants"
-            }
-          },
-          {
-            type: "actions",
-            elements: [
-              {
-                type: "datepicker",
-                action_id: "start_date",
-                // "initial_date": "2109-06-07",
-                placeholder: {
-                  type: "plain_text",
-                  text: "Select start date",
-                  emoji: true
-                }
-              },
-              {
-                type: "datepicker",
-                action_id: "end_date",
-                // "initial_date": "2019-06-07",
-                placeholder: {
-                  type: "plain_text",
-                  text: "Select end date",
-                  emoji: true
-                }
-              },
-              {
-                type: "button",
-                text: {
-                  type: "plain_text",
-                  text: "Submit",
-                  emoji: true
-                },
-                style: "primary",
-                value: "Submit",
-                confirm: {
-                  "title": {
-                      "type": "plain_text",
-                      "text": "Are you sure?"
-                  },
-                  "text": {
-                      "type": "mrkdwn",
-                      // Trying to output the user selected date
-                      // "text": `Start: ${newDate[message.actions[0].block_id].start_date !== undefined ? newDate[message.actions[0].block_id].start_date : "bleh"} to End: ${newDate[message.actions[0].block_id].end_date !== undefined ? newDate[message.actions[0].block_id].end_date : "bleh"}`,
-                      "text": "Please double check the date."
-                  },
-                  "confirm": {
-                      "type": "plain_text",
-                      "text": "Confirm"
-                  },
-                  "deny": {
-                      "type": "plain_text",
-                      "text": "Cancel"
-                  }
-                }
-              }
-            ]
-          }
-        ]
+        blocks: block_helper.schedule_vacay(new_message)
       });
       console.log(message);
     }
@@ -261,7 +200,7 @@ module.exports = function(controller) {
             )}* - *${moment(dbRespond.endDate).format(
               "MMMM DD, YYYY"
             )}*\nDelete this vacation?`
-          }, 
+          },
           accessory: {
             type: "button",
             text: {

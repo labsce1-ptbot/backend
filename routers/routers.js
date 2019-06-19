@@ -7,12 +7,14 @@ module.exports = {
   add_date: async message => {
     console.log("<----------MESSAGE-------->\n", message);
     console.log("<----Date NOW---->\n", Date.now());
-    event = new Event();
 
+    const date_string = `${message.start_date}T12:59`;
+
+    event = new Event();
     (event.slackID = message.userID),
-      (event.startDate = message.start_date),
+      (event.startDate = date_string),
       (event.endDate = message.end_date),
-      (event.message = "message.text");
+      (event.message = "message.txt");
 
     // let conflicts = await searchConflict(event);
     // if (conflicts.length === 0) {
