@@ -1,9 +1,11 @@
 const NodeCron = require("../../config/node-con");
 const botkitRouter = require("../../routers/botkitRouter");
 const bodyParser = require("body-parser");
+const users = require("../../models/user-model");
+const userRoutes = require("../../routers/users/usersRoutes");
 
 module.exports = function(botkit) {
-  NodeCron();
+  // NodeCron();
   return {
     // The name of the plugin. Used to log messages at boot time.
     name: "Server.js",
@@ -24,6 +26,7 @@ module.exports = function(botkit) {
       });
 
       controller.webserver.use("/api/messages", botkitRouter);
+      controller.webserver.use("/users", userRoutes);
       controller.webserver.use(
         bodyParser.urlencoded({
           limit: "50mb",
@@ -35,6 +38,12 @@ module.exports = function(botkit) {
       controller.webserver.use(
         bodyParser.json({ limit: "50mb", extended: true })
       );
+
+      controller.webserver.get("/users", (req, res) => {
+        users.find({}, (err, users) => {
+          res.send(users);
+        });
+      });
 
       // can also define normal handlers
       // controller.on('event', async(bot, message) => { ... });
