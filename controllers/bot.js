@@ -9,6 +9,9 @@ const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
 require("dotenv").config();
 
+// Importing custom plugins
+let plugin = require("./plugins/server");
+
 // Import a platform-specific adapter for slack.
 
 const {
@@ -76,6 +79,9 @@ if (process.env.cms_uri) {
 controller.ready(() => {
   // load traditional developer-created local custom feature modules
   controller.loadModules(__dirname + "/features");
+
+  // loading in custom plugins
+  controller.usePlugin(plugin);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
