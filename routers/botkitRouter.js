@@ -1,4 +1,4 @@
-const slack = require("../controllers/bot.js");
+const slack = require("../bot.js/index.js");
 const express = require("express");
 const router = express.Router();
 
