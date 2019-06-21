@@ -2,7 +2,12 @@ const NodeCron = require("../../config/node-con");
 const botkitRouter = require("../../routers/botkitRouter");
 const bodyParser = require("body-parser");
 const users = require("../../models/user-model");
-const userRoutes = require("../../routers/users/usersRoutes");
+const userRoutes = require("./usersRoutes");
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const passport = require("passport");
+const session = require("express-session");
 
 module.exports = function(botkit) {
   // NodeCron();
@@ -25,8 +30,10 @@ module.exports = function(botkit) {
         res.send("Hello World");
       });
 
-      controller.webserver.use("/api/messages", botkitRouter);
+      // controller.webserver.use("/api/messages", botkitRouter);
+
       controller.webserver.use("/users", userRoutes);
+
       controller.webserver.use(
         bodyParser.urlencoded({
           limit: "50mb",
@@ -39,11 +46,27 @@ module.exports = function(botkit) {
         bodyParser.json({ limit: "50mb", extended: true })
       );
 
-      controller.webserver.get("/users", (req, res) => {
-        users.find({}, (err, users) => {
-          res.send(users);
-        });
-      });
+      controller.webserver.use(
+        cors({
+          origin: process.env.ORIGIN || "https://4389aef5.ngrok.io",
+          credentials: true
+        }),
+        helmet(),
+        session({
+          secret: process.env.secret,
+          saveUninitialized: true,
+          resave: true
+        }),
+        passport.initialize(),
+        passport.session()
+      );
+
+      console.log(controller);
+      // controller.webserver.get("/users", (req, res) => {
+      //   users.find({}, (err, users) => {
+      //     res.send(users);
+      //   });
+      // });
 
       // can also define normal handlers
       // controller.on('event', async(bot, message) => { ... });
