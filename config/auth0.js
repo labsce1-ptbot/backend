@@ -61,6 +61,7 @@ passport.use(
 passport.serializeUser((profile, done) => done(null, profile));
 passport.deserializeUser((profile, done) => done(null, profile));
 
+
 router.get(
   "/callback",
   passport.authenticate("auth0", {
@@ -71,6 +72,12 @@ router.get(
 
 router.get("/login", passport.authenticate("auth0", {}), function(req, res) {
   res.redirect("/");
-});
+}); 
 
-module.exports = router;
+
+router.get("/logout", (req, res) => {
+  req.logout()
+  res.redirect("/conf")
+})
+module.exports = router
+

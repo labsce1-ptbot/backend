@@ -1,25 +1,53 @@
-// const express = require('express');
-// const passport = require('passport')
-// const SlackStrategy = require('passport-slack').Strategy
+const express = require('express');
+const SlackStrategy = require('passport-slack').Strategy
+const passport = require('passport')
+const request = require('request')
 
-// const router = express.router()
 
-// const slackStrategy = new SlackStrategy({
-//   clientId: process.env.clientId,
-//   clientSecret: process.env.clientSecret),
-//   (accessToken, refreshToken, profile, done) => {
-//     done(null, profile)
-//   }
+const router = express.Router()
+
+passport.use(new SlackStrategy({
+  clientID: process.env.clientId,
+  clientSecret: process.env.clientSecret,
+  scope: ['identity.basic', 'identity.email', 'identity.avatar', 'identity.team']
+}, (accessToken, refreshToken, profile, done) => {
+  console.log(profile)
+  done(null, profile)
+  }
+))
+
+
+// router.get("/user", (req, res) => {
+//   let url = "https://slack.com/api/auth.test"
+//   request.post(url, {'auth': { 'bearer': `${process.env.authToken}` }},(err, httpResponse, body) => {
+//     console.log(httpResponse.body)
+//   })
 // })
 
-// passport.use(slackStrategy)
+// https://slack.com/oauth/authorize?clientid=651818658071.649469653572?scope=identity.basic
+router.get("/user", (req, res) => {
+  let url = `https://slack.com/oauth/authorize?client_id=${process.env.clientId}&scope=identity.basic`
+  request.get(url,(err, httpResponse, body) => {
+    res.send(body)
+  
+  })
+})
 
-// router.get('/slack', passport.authorize('slack'));
+router.get("/test", (req, res) => {
+  console.log("Hello")
+})
+
+passport.serializeUser((profile, done) => done(null, profile))
+passport.deserializeUser((profile, done) => done(null, profile))
+
+router.get('/', passport.authenticate('slack'), (req, res) => {
+  console.log(req)
+});
  
-// // OAuth callback url
-// router.get('/slack/callback', 
-//   passport.authorize('slack', { failureRedirect: '/login' }),
-//   (req, res) => res.redirect('/')
-// );
+// OAuth callback url
+router.get('/slack/callback', 
+  passport.authenticate('Slack', { successRedirect: "https://8c699a1b.ngrok.io/test", failureRedirect: 'https://8c699a1b.ngrok.io/failure' }),
+  (req, res) => console.log("Hey")
+);
 
-// module.exports = router
+module.exports = router

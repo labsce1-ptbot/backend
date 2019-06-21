@@ -28,15 +28,22 @@ app.use(
 );
 
 // Imported Routers
-const authRoutes = require("./config/auth0.js");
-const userRoutes = require("./routers/users/usersRoutes");
+
+const slackRoutes = require('./config/auth-slack')
+const auth0Routes = require('./config/auth0.js')
+const userRoutes = require("./routers/users/usersRoutes")
+
 
 // Models
 const users = require("./models/user-model");
 
 // Routes
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
+
+app.use("/auth", auth0Routes)
+app.use("/slack", slackRoutes)
+app.use("/users", userRoutes)
+
+
 // Initializing Middleware
 app.use("/api/messages", botkitRouter);
 
@@ -45,6 +52,7 @@ NodeCron();
 
 // Test endpoint to see if server is running
 app.get("/", (req, res) => {
+  console.log(req.query.code)
   res.send("Hello, World!");
 });
 
@@ -59,6 +67,7 @@ app.get("/logged", (req, res) => {
   res.send("Successfully Worked as far as authenticating");
 });
 
+// Remove later, used to check session is intact
 app.get("/check", (req, res) => {
   if (req.session.views) {
     req.session.views++;
@@ -72,11 +81,16 @@ app.get("/check", (req, res) => {
   }
 });
 
-app.get("/", (req, res) => {});
+
+// Make sure session is ended on logout 
+app.get("/conf", (req, res) => {
+  res.send("Logged out!")
+})
 
 app.get("/failure", (req, res) => {
-  res.send("Failure to authenticate");
-});
+  res.send("Failure to authenticate or authorize")
+})
+
 // Testing atm, Trying to get botkit to respond from port 5000
 require("./routers/botkitRouter")(app);
 
