@@ -1,7 +1,13 @@
+const NodeCron = require("../../config/node-con");
+const botkitRouter = require("../../routers/botkitRouter");
+const bodyParser = require("body-parser");
+
 module.exports = function(botkit) {
+  NodeCron();
   return {
     // The name of the plugin. Used to log messages at boot time.
     name: "Server.js",
+
     // initialize this module. called at load time.
     init: function(controller) {
       // do things like:
@@ -16,6 +22,19 @@ module.exports = function(botkit) {
       controller.webserver.get("/myplugins", async (req, res) => {
         res.send("Hello World");
       });
+
+      controller.webserver.use("/api/messages", botkitRouter);
+      controller.webserver.use(
+        bodyParser.urlencoded({
+          limit: "50mb",
+          extended: true,
+          parameterLimit: 50000
+        })
+      );
+
+      controller.webserver.use(
+        bodyParser.json({ limit: "50mb", extended: true })
+      );
 
       // can also define normal handlers
       // controller.on('event', async(bot, message) => { ... });
