@@ -61,13 +61,17 @@ passport.serializeUser((profile, done) => done(null, profile))
 passport.deserializeUser((profile, done) => done(null, profile))
 
 router.get('/callback',
-  passport.authenticate('auth0', { successRedirect: 'https://4389aef5.ngrok.io/logged', failureRedirect: 'https://4389aef5.ngrok.io/failure' },
+  passport.authenticate('auth0', { successRedirect: 'http://localhost:5000/logged', failureRedirect: 'http://localhost:5000/failure' },
   ),
 );
  
 router.get('/login',
   passport.authenticate('auth0', {}), function (req, res) {
   res.redirect("/");
-});
+}); 
 
+router.get("/logout", (req, res) => {
+  req.logout()
+  res.redirect("/conf")
+})
 module.exports = router
