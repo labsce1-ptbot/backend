@@ -10,7 +10,9 @@ const { BotkitCMSHelper } = require("botkit-plugin-cms");
 require("dotenv").config();
 
 // Importing custom plugins
-let plugin = require("./plugins/server");
+let server = require("./controllers/plugins/server");
+let passportOAuth = require("./controllers/plugins/passport-oauth");
+let session = require("./controllers/plugins/session");
 
 // Import a platform-specific adapter for slack.
 
@@ -78,10 +80,12 @@ if (process.env.cms_uri) {
 // Once the bot has booted up its internal services, you can use them to do stuff.
 controller.ready(() => {
   // load traditional developer-created local custom feature modules
-  controller.loadModules(__dirname + "/features");
+  controller.loadModules(__dirname + "/controllers/features");
 
   // loading in custom plugins
-  controller.usePlugin(plugin);
+  controller.usePlugin(server);
+  controller.usePlugin(passportOAuth);
+  // controller.usePlugin(auth0);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
