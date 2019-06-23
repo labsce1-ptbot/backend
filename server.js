@@ -26,7 +26,7 @@ app.use(
     extended: true,
     parameterLimit: 50000
   })
-)
+) 
 
 // Imported Routers
 const slackRoutes = require('./config/auth-slack')
@@ -49,14 +49,13 @@ NodeCron();
 
 // Test endpoint to see if server is running
 app.get("/", (req, res) => {
-  console.log(req.query.code)
   res.send("Hello, World!");
 });
 
 // List All Users
 app.get("/users", (req, res) => {
   users.find({}, (err, users) => {
-    res.send(users)
+    console.log(users)
   })
 })
 

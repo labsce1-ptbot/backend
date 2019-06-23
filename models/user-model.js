@@ -3,11 +3,10 @@ const Schema = mongoose.Schema;
 
 const UserSchema = Schema({
   username: {type: String, required: true, max: 15, unique: true},
-  password: {type: String},
   first_name: {type: String, required: true},
   last_name: { type: String, required: true},
   email: {type: String, required: true, unique: true},
   picture: {type: String} 
-}, {autocreate: true})
+})
 
 User = module.exports = mongoose.model("User", UserSchema)

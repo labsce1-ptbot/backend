@@ -8,7 +8,7 @@ module.exports = app => {
   app.use(
     express.json(),
     cors({
-      origin: process.env.ORIGIN || "https://8c699a1b.ngrok.io",
+      origin: process.env.ORIGIN || "http://localhost:5000",
       credentials: true
     }),
     helmet(),
