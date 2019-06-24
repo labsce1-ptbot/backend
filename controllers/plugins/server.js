@@ -60,6 +60,13 @@ module.exports = function(botkit) {
       //   passport.initialize(),
       //   passport.session()
       // );
+      controller.webserver.get("/logged", (req, res) => {
+        res.send("Successfully Worked as far as authenticating");
+      });
+
+      controller.webserver.get("/failure", (req, res) => {
+        res.send("Failure to authenticate");
+      });
 
       console.log(controller);
 

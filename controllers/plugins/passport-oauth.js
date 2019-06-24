@@ -43,8 +43,8 @@ module.exports = function(botkit) {
         controller.webserver.get(
           "/auth/callback",
           passport.authenticate("auth0", {
-            successRedirect: "http://localhost:3000/logged",
-            failureRedirect: "http://localhost:3000/failure"
+            successRedirect: "/logged",
+            failureRedirect: "/failure"
           })
         );
 
@@ -83,13 +83,13 @@ module.exports = function(botkit) {
       //     }
       //   );
 
-      controller.webserver.get("/logged", (req, res) => {
-        res.send("Successfully Worked as far as authenticating");
-      });
+      // controller.webserver.get("/logged", (req, res) => {
+      //   res.send("Successfully Worked as far as authenticating");
+      // });
 
-      controller.webserver.get("/failure", (req, res) => {
-        res.send("Failure to authenticate");
-      });
+      // controller.webserver.get("/failure", (req, res) => {
+      //   res.send("Failure to authenticate");
+      // });
     }
   };
 };
