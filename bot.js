@@ -85,7 +85,7 @@ controller.ready(() => {
   // loading in custom plugins
   controller.usePlugin(server);
   controller.usePlugin(passportOAuth);
-  // controller.usePlugin(auth0);
+  controller.usePlugin(session);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {

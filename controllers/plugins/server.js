@@ -48,7 +48,7 @@ module.exports = function(botkit) {
 
       controller.webserver.use(
         cors({
-          origin: process.env.ORIGIN || "https://4389aef5.ngrok.io",
+          origin: process.env.ORIGIN || "http://localhost:3000",
           credentials: true
         }),
         helmet(),
