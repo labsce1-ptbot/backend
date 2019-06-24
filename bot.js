@@ -13,6 +13,7 @@ require("dotenv").config();
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
 let session = require("./controllers/plugins/session");
+let userRoutes = require("./controllers/plugins/usersRoutes");
 
 // Import a platform-specific adapter for slack.
 
@@ -86,6 +87,7 @@ controller.ready(() => {
   controller.usePlugin(server);
   controller.usePlugin(passportOAuth);
   controller.usePlugin(session);
+  controller.usePlugin(userRoutes);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
