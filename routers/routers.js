@@ -1,5 +1,5 @@
 const Event = require("../models/event-model");
-const User = require("../models/user-model")
+const User = require("../models/user-model");
 const db = require("../config/db");
 
 module.exports = {
@@ -69,8 +69,18 @@ module.exports = {
   },
   // Auth
   addUser: async profile => {
-    let foundUser = User.find({email: profile.email})
-    if(foundUser) {
+    let foundUser = await User.find({ email: profile.email }, function(
+      err,
+      docs
+    ) {
+      console.log("error: ", err);
+    });
+    console.log(
+      "<-=-=-=-= foundUser before if statement =-=-=-=-=->\n",
+      foundUser
+    );
+    if (foundUser) {
+      console.log("<-=-=-=-=- foundUser =-=-=-=->\n", foundUser);
       return foundUser;
     }
 
@@ -79,13 +89,14 @@ module.exports = {
       first_name: profile.given_name,
       last_name: profile.family_name,
       email: profile.email,
-      picture: profile.picture, 
-    })
+      picture: profile.picture
+    });
 
-    console.log(newUser)
+    console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
 
-    let userAdd = await newUser.save()
+    let userAdd = await newUser.save();
+    console.log("<-=-=-== userADD =-=-=-=-=->\n", userAdd);
     // return new_user
-    return userAdd
+    return userAdd;
   }
 };

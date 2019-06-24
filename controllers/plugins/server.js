@@ -1,5 +1,5 @@
 const NodeCron = require("../../config/node-con");
-const botkitRouter = require("../../routers/botkitRouter");
+// const botkitRouter = require("../../routers/botkitRouter");
 const bodyParser = require("body-parser");
 const users = require("../../models/user-model");
 const userRoutes = require("./usersRoutes");
@@ -46,45 +46,35 @@ module.exports = function(botkit) {
         bodyParser.json({ limit: "50mb", extended: true })
       );
 
-      controller.webserver.use(
-        cors({
-          origin: process.env.ORIGIN || "http://localhost:3000",
-          credentials: true
-        }),
-        helmet(),
-        session({
-          secret: process.env.secret,
-          saveUninitialized: true,
-          resave: true
-        }),
-        passport.initialize(),
-        passport.session()
-      );
+      // controller.webserver.use(
+      //   cors({
+      //     origin: process.env.ORIGIN || "http://localhost:3000",
+      //     credentials: true
+      //   }),
+      //   helmet(),
+      //   session({
+      //     secret: process.env.secret,
+      //     saveUninitialized: true,
+      //     resave: true
+      //   }),
+      //   passport.initialize(),
+      //   passport.session()
+      // );
+      controller.webserver.get("/logged", (req, res) => {
+        res.send("Successfully Worked as far as authenticating");
+      });
+
+      controller.webserver.get("/failure", (req, res) => {
+        res.send("Failure to authenticate");
+      });
 
       console.log(controller);
-      // controller.webserver.get("/users", (req, res) => {
-      //   users.find({}, (err, users) => {
-      //     res.send(users);
-      //   });
-      // });
 
-      // can also define normal handlers
-      // controller.on('event', async(bot, message) => { ... });
+      controller.webserver.get("/users", (req, res) => {
+        users.find({}, (err, users) => {
+          res.send(users);
+        });
+      });
     }
-    // Any middlewares that should be automatically bound
-    // Can include more than 1 of each kind.
-    // middleware: {
-    //     ingest: [
-    //         (bot, message, next) => { next(); }
-    //     ],
-    //     receive: [
-    //         (bot, message, next) => { next(); }
-    //     ],
-    //     send: [
-    //         (bot, message, next) => { next(); }
-    //     ]
-    // },
-    // this method will live at controller.plugins.myplugin.customMethod()
-    // customMethod: async() => {}
   };
 };

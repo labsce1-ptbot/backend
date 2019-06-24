@@ -4,8 +4,8 @@ const helmet = require("helmet");
 const passport = require("passport");
 const session = require("express-session");
 
-module.exports = app => {
-  app.webserver.use(
+module.exports = controller => {
+  controller.webserver.use(
     express.json(),
     cors({
       origin: process.env.ORIGIN || "http://localhost:3000",
