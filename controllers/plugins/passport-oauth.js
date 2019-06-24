@@ -41,10 +41,10 @@ module.exports = function(botkit) {
         passport.deserializeUser((profile, done) => done(null, profile));
 
         controller.webserver.get(
-          "/callback",
+          "/auth/callback",
           passport.authenticate("auth0", {
-            successRedirect: "localhost:3000/logged",
-            failureRedirect: "localhost:3000/failure"
+            successRedirect: "http://localhost:3000/logged",
+            failureRedirect: "http://localhost:3000/failure"
           })
         );
 

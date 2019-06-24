@@ -8,23 +8,11 @@ const sessionMiddleWare = require("../../config/session");
 module.exports = function(botkit) {
   return {
     // The name of the plugin. Used to log messages at boot time.
-    name: "Server.js",
+    name: "sessionMiddleWare.js",
     // initialize this module. called at load time.
     init: function(controller) {
-      // do things like:
-      //   function myExpressMiddleware(req, res, next) {
-      //     // do something useful.
-      //     // for example, you can modify req and res
-
-      //     // log the requested url. handy for debugging!
-      //     console.log("REQ: ", req.url);
-
-      //     // call next or else the request will be intercepted
-      //     next();
-      //   }
-
       // add a web route
-      controller.webserver.use(sessionMiddleWare);
+      controller.webserver.use(sessionMiddleWare(controller));
 
       // can also define normal handlers
       // controller.on('event', async(bot, message) => { ... });
