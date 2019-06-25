@@ -38,7 +38,6 @@ module.exports = {
     //   { $push: { event: dbResponse._id } }
     // );
 
-    console.log("<-----x------>", eventID_to_User);
     return dbResponse;
   },
   get_date: async () => {
