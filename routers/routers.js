@@ -118,5 +118,14 @@ module.exports = {
     return userAdd;
   },
 
-  save_vacation: async message => {}
+  save_vacation: async message => {},
+
+  //runs every Sunday to clear out expired vacations
+  clean_old_vacations: async () => {
+    const u = await Event.find({ endDate: { $lt: Date.now() } });
+
+    const l = u.map(id => id._id);
+    console.log("====u======", l);
+    const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
+  }
 };
