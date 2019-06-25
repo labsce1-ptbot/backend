@@ -56,6 +56,11 @@ module.exports = function(botkit) {
           }
         );
 
+        controller.webserver.get("/auth/logout", (req, res) => {
+          req.logout();
+          res.redirect("/");
+        });
+
         // log the requested url. handy for debugging!
         console.log("REQ: ", req.url);
 
