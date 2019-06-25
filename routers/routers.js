@@ -28,6 +28,7 @@ module.exports = {
 
     console.log("<-----EVENT------>", event);
     const dbResponse = await event.save();
+    console.log("<-----db------>", dbResponse);
     return dbResponse;
   },
   get_date: async () => {
@@ -79,7 +80,7 @@ module.exports = {
       "<-=-=-=-= foundUser before if statement =-=-=-=-=->\n",
       foundUser
     );
-    if (foundUser) {
+    if (foundUser.length > 0) {
       console.log("<-=-=-=-=- foundUser =-=-=-=->\n", foundUser);
       return foundUser;
     }
@@ -98,5 +99,7 @@ module.exports = {
     console.log("<-=-=-== userADD =-=-=-=-=->\n", userAdd);
     // return new_user
     return userAdd;
-  }
+  },
+
+  save_vacation: async message => {}
 };
