@@ -154,21 +154,33 @@ module.exports = function(controller) {
 
   // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-    // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
+    console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      await bot.replyInThread(
-        message,
-        ` <@${userRegex[0]}> is currently on vacation from <!date^` +
-          moment(cache[`${userRegex[0]}`].start_date).unix() +
-          `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
-          moment(cache[`${userRegex[0]}`].end_date).unix() +
-          `^{date_long}|Posted 2014-02-18 PST>`
-      );
+      if (message.channel_type === "group") {
+        await bot.startPrivateConversation(message.user);
+        await bot.say(
+          ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+            moment(cache[`${userRegex[0]}`].start_date).unix() +
+            `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+            moment(cache[`${userRegex[0]}`].end_date).unix() +
+            `^{date_long}|Posted 2014-02-18 PST>`
+        );
+      } else {
+        await bot.replyInThread(
+          message,
+          ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+            moment(cache[`${userRegex[0]}`].start_date).unix() +
+            `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+            moment(cache[`${userRegex[0]}`].end_date).unix() +
+            `^{date_long}|Posted 2014-02-18 PST>`
+        );
+      }
     }
   });
 
+  // Deleting vacation from /slash all
   controller.on("block_actions", async (bot, message) => {
     if (
       message.actions[0].text != undefined &&
@@ -187,6 +199,7 @@ module.exports = function(controller) {
     }
   });
 
+  // Slash command to list all vacation time of user
   controller.on("slash_command", async (bot, message) => {
     if (message.text === "all") {
       const allMsgs = await db.showAll(message);
