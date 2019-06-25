@@ -24,7 +24,7 @@ module.exports = function(controller) {
 
   // Response to (any) block actions (in this case) after calling slash commands
   controller.on("block_actions", async (bot, message) => {
-    console.log("<-- MESSAGE -->\n", message);
+    console.log("<-- MESSAGE -->\n", message.incoming_message.channelData.user);
     console.log("<-- newDate -->\n", newDate);
     const {
       block_id,
@@ -76,6 +76,10 @@ module.exports = function(controller) {
           blocks: block_helper.schedule_vacay(date_error_msg)
         });
       } else {
+        console.log(
+          "=============bg===========",
+          newDate[message.actions[0].block_id]
+        );
         const dbResponse = await db.add_date(
           newDate[message.actions[0].block_id]
         );
@@ -182,14 +186,15 @@ module.exports = function(controller) {
 
   // Deleting vacation from /slash all
   controller.on("block_actions", async (bot, message) => {
-    if (
-      message.actions[0].text != undefined &&
-      message.actions[0].text.text === "Delete"
-    ) {
-      const dbResponse = await db.deleteVacation(message.actions[0].value);
+    const { text, value } = message.actions[0];
+    if (text != undefined && text.text === "Delete") {
+      const dbResponse = await db.deleteVacation(value);
 
       if (dbResponse > 0) {
-        return await bot.replyPrivate(message, "Booo, Vacation deleted");
+        return await bot.replyPrivate(
+          message,
+          "Your vacation has been deleted"
+        );
       } else {
         await bot.replyPrivate(
           message,

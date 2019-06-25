@@ -28,6 +28,16 @@ module.exports = {
 
     console.log("<-----EVENT------>", event);
     const dbResponse = await event.save();
+    console.log("<-----db------>", dbResponse);
+
+    //adds the event id to ref on user table
+    // const eventID_to_User = await User.updateOne(
+    //   {
+    //     email: "message.email"
+    //   },
+    //   { $push: { event: dbResponse._id } }
+    // );
+
     return dbResponse;
   },
   get_date: async () => {
@@ -63,10 +73,18 @@ module.exports = {
     return all_msgs;
   },
 
+  //deletes a vacation
   deleteVacation: async id => {
     const count = await Event.deleteOne({ _id: `${id}` });
+
+    //deletes the ref in users
+    // const remove_ref = await User.updateOne(
+    //   { email: "message.email" },
+    //   { $pull: { event: id } }
+    // );
     return count.n;
   },
+
   // Auth
   addUser: async profile => {
     let foundUser = await User.find({ email: profile.email }, function(
@@ -79,7 +97,7 @@ module.exports = {
       "<-=-=-=-= foundUser before if statement =-=-=-=-=->\n",
       foundUser
     );
-    if (foundUser) {
+    if (foundUser.length > 0) {
       console.log("<-=-=-=-=- foundUser =-=-=-=->\n", foundUser);
       return foundUser;
     }
@@ -98,5 +116,16 @@ module.exports = {
     console.log("<-=-=-== userADD =-=-=-=-=->\n", userAdd);
     // return new_user
     return userAdd;
+  },
+
+  save_vacation: async message => {},
+
+  //runs every Sunday to clear out expired vacations
+  clean_old_vacations: async () => {
+    const u = await Event.find({ endDate: { $lt: Date.now() } });
+
+    const l = u.map(id => id._id);
+    console.log("====u======", l);
+    const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
   }
 };
