@@ -3,11 +3,6 @@ const NodeCron = require("../../config/node-con");
 const bodyParser = require("body-parser");
 const users = require("../../models/user-model");
 const userRoutes = require("./usersRoutes");
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const passport = require("passport");
-const session = require("express-session");
 
 module.exports = function(botkit) {
   // NodeCron();
