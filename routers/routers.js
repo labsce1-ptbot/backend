@@ -1,12 +1,12 @@
-const Event = require("../models/event-model");
-const User = require("../models/user-model");
-const db = require("../config/db");
+const Event = require('../models/event-model');
+const User = require('../models/user-model');
+const db = require('../config/db');
 
 module.exports = {
   // Slack
   add_date: async message => {
-    console.log("<----------MESSAGE-------->\n", message);
-    console.log("<----Date NOW---->\n", Date.now());
+    console.log('<----------MESSAGE-------->\n', message);
+    console.log('<----Date NOW---->\n', Date.now());
 
     const date_string = `${message.start_date}T12:59`;
 
@@ -14,7 +14,7 @@ module.exports = {
     (event.slackID = message.userID),
       (event.startDate = date_string),
       (event.endDate = message.end_date),
-      (event.message = "message.txt");
+      (event.message = 'message.txt');
 
     // let conflicts = await searchConflict(event);
     // if (conflicts.length === 0) {
@@ -26,7 +26,7 @@ module.exports = {
     //   return conflicts;
     // }
 
-    console.log("<-----EVENT------>", event);
+    console.log('<-----EVENT------>', event);
     const dbResponse = await event.save();
     console.log("<-----db------>", dbResponse);
 
@@ -41,10 +41,10 @@ module.exports = {
     return dbResponse;
   },
   get_date: async () => {
-    console.log("<---- GET Date NOW---->\n");
+    console.log('<---- GET Date NOW---->\n');
     const y = await Event.find({
       startDate: { $lte: Date.now() },
-      endDate: { $gte: Date.now() }
+      endDate: { $gte: Date.now() },
     });
     return y;
   },
@@ -55,19 +55,19 @@ module.exports = {
       $or: [
         {
           startDate: { $gte: event.startDate, $lte: event.endDate },
-          endDate: { $gte: event.startDate, $lte: event.endDate }
-        }
-      ]
+          endDate: { $gte: event.startDate, $lte: event.endDate },
+        },
+      ],
     });
 
-    console.log("=======conflict_array=========", conflict_array);
+    console.log('=======conflict_array=========', conflict_array);
     return conflict_array;
   },
 
   showAll: async message => {
     console.log(message.user);
     const all_msgs = await Event.find({
-      slackID: message.user
+      slackID: message.user,
     });
     console.log(all_msgs);
     return all_msgs;
@@ -86,6 +86,15 @@ module.exports = {
   },
 
   // Auth
+  findUser: async profile => {
+    let foundUser = await User.find({ email: profile.email });
+    console.log('--------FindUser--------\n', foundUser);
+    if(foundUser !== []) {
+    return foundUser;
+    } else {
+    return "User doesn't exist"
+    }
+  },
   addUser: async profile => {
     let foundUser = await User.find({ email: profile.email }, function(
       err,

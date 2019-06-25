@@ -12,6 +12,7 @@ require("dotenv").config();
 // Importing custom plugins
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
+let authSlack = require("./controllers/plugins/slack-auth");
 let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/usersRoutes");
 
@@ -88,6 +89,7 @@ controller.ready(() => {
   controller.usePlugin(passportOAuth);
   controller.usePlugin(session);
   controller.usePlugin(userRoutes);
+  controller.usePlugin(authSlack)
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
