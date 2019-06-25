@@ -10,7 +10,7 @@ module.exports = (botkit) => {
       function slackAuthRoutes(req, res, next) {
         if(req.isAuthenticated()) {
         controller.webserver.get("/slack/user",(req, res) => {
-          let url = `https://slack.com/oauth/authorize?client_id=${process.env.clientId}&scope=identity.basic`
+          let url = `https://slack.com/oauth/authorize?client_id=${process.env.clientId}&scope=identity.basic identity.email`
           request.get(url,(err, httpResponse, body) => {
             res.send(body)
           })
