@@ -29,6 +29,15 @@ module.exports = {
     console.log("<-----EVENT------>", event);
     const dbResponse = await event.save();
     console.log("<-----db------>", dbResponse);
+
+    // const add_event_to_User = await User.updateOne(
+    //   {
+    //     email: message.email
+    //   },
+    //   { $push: { event: dbResponse._id } }
+    // );
+
+    console.log("<-----x------>", add_event_to_User);
     return dbResponse;
   },
   get_date: async () => {
