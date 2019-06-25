@@ -30,14 +30,15 @@ module.exports = {
     const dbResponse = await event.save();
     console.log("<-----db------>", dbResponse);
 
-    // const add_event_to_User = await User.updateOne(
+    //adds the event id to ref on user table
+    // const eventID_to_User = await User.updateOne(
     //   {
-    //     email: message.email
+    //     email: "message.email"
     //   },
     //   { $push: { event: dbResponse._id } }
     // );
 
-    console.log("<-----x------>", add_event_to_User);
+    console.log("<-----x------>", eventID_to_User);
     return dbResponse;
   },
   get_date: async () => {
@@ -73,10 +74,18 @@ module.exports = {
     return all_msgs;
   },
 
+  //deletes a vacation
   deleteVacation: async id => {
     const count = await Event.deleteOne({ _id: `${id}` });
+
+    //deletes the ref in users
+    // const remove_ref = await User.updateOne(
+    //   { email: "message.email" },
+    //   { $pull: { event: id } }
+    // );
     return count.n;
   },
+
   // Auth
   addUser: async profile => {
     let foundUser = await User.find({ email: profile.email }, function(
