@@ -26,7 +26,7 @@ module.exports = function(botkit) {
               profile.refreshtoken = refreshToken;
               profile.expiresIn = extraParams.expires_in;
               profile.expires = moment().add(profile.expiresIn, "s");
-              console.log(profile);
+              console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
               try {
                 user = await User.addUser(profile._json);
                 return done(null, user);
@@ -41,15 +41,15 @@ module.exports = function(botkit) {
         passport.deserializeUser((profile, done) => done(null, profile));
 
         controller.webserver.get(
-          "/callback",
+          "/auth/callback",
           passport.authenticate("auth0", {
-            successRedirect: "localhost:3000/logged",
-            failureRedirect: "localhost:3000/failure"
+            successRedirect: "/logged",
+            failureRedirect: "/failure"
           })
         );
 
         controller.webserver.get(
-          "/login",
+          "/auth/login",
           passport.authenticate("auth0", {}),
           function(req, res) {
             res.redirect("/");
@@ -83,29 +83,13 @@ module.exports = function(botkit) {
       //     }
       //   );
 
-      controller.webserver.get("/logged", (req, res) => {
-        res.send("Successfully Worked as far as authenticating");
-      });
+      // controller.webserver.get("/logged", (req, res) => {
+      //   res.send("Successfully Worked as far as authenticating");
+      // });
 
-      controller.webserver.get("/failure", (req, res) => {
-        res.send("Failure to authenticate");
-      });
-
-      // Any middlewares that should be automatically bound
-      // Can include more than 1 of each kind.
-      // middleware: {
-      //     ingest: [
-      //         (bot, message, next) => { next(); }
-      //     ],
-      //     receive: [
-      //         (bot, message, next) => { next(); }
-      //     ],
-      //     send: [
-      //         (bot, message, next) => { next(); }
-      //     ]
-      // },
-      // this method will live at controller.plugins.myplugin.customMethod()
-      // customMethod: async() => {}
+      // controller.webserver.get("/failure", (req, res) => {
+      //   res.send("Failure to authenticate");
+      // });
     }
   };
 };
