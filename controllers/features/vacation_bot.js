@@ -226,7 +226,25 @@ module.exports = function(controller) {
               text: "Delete"
             },
             value: `${dbRespond._id}`,
-            action_id: "button"
+            action_id: "button",
+            confirm: {
+              title: {
+                type: "plain_text",
+                text: "Are you sure?"
+              },
+              text: {
+                type: "mrkdwn",
+                text: "Please double check the date."
+              },
+              confirm: {
+                type: "plain_text",
+                text: "Confirm"
+              },
+              deny: {
+                type: "plain_text",
+                text: "Cancel"
+              }
+            }
           }
         }));
 
