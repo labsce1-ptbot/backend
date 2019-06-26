@@ -12,6 +12,7 @@ var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
 let block_helper = require("../../routers/interactive_blocks");
+const { SlackDialog } = require("botbuilder-adapter-slack");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -85,7 +86,9 @@ module.exports = function(controller) {
         );
 
         if ((dbResponse.slackID = message.user)) {
-          await bot.replyPrivate(message, "vacation time scheduled!");
+          await bot.replyPrivate(message, {
+            blocks: block_helper.custom_message()
+          });
           delete newDate[message.actions[0].block_id];
           console.log(newDate[message.actions[0].block_id]);
         } else {
@@ -256,5 +259,24 @@ module.exports = function(controller) {
         );
       }
     }
+  });
+
+  controller.on("block_actions", async (bot, message) => {
+    console.log("===========block actions", message);
+    const { value } = message.actions[0];
+
+    if (value === "Use Default Message") {
+      await bot.replyPrivate(
+        message,
+        "Your vacation is scheduled with our default away message"
+      );
+    }
+  });
+
+  controller.on("block_actions", async (bot, message) => {
+    let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
+    dialog.addText("Your full name", "name").addEmail("Your email", "email");
+    dialog.notifyOnCancel(true);
+    bot.replyWithDialog(message, dialog.asObject());
   });
 };

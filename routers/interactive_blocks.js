@@ -70,5 +70,44 @@ module.exports = {
         ]
       }
     ];
+  },
+
+  custom_message: () => {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            "*Your Vacation has been scheduled!*\n Do you want to add a custom away message?"
+        }
+      },
+
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Create Custom Message"
+            },
+            style: "primary",
+            value: "Custom Message"
+          },
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "No Thanks"
+            },
+
+            value: "Use Default Message"
+          }
+        ]
+      }
+    ];
   }
 };
