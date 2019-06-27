@@ -274,9 +274,25 @@ module.exports = function(controller) {
   });
 
   controller.on("block_actions", async (bot, message) => {
+    console.log("========message===============", message);
     let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
-    dialog.addText("Your full name", "name").addEmail("Your email", "email");
-    dialog.notifyOnCancel(true);
-    bot.replyWithDialog(message, dialog.asObject());
+    dialog.addEmail("Message", "name").notifyOnCancel(false);
+
+    await bot.replyWithDialog(message, dialog.asObject());
+  });
+
+  controller.on("dialog_submission", async (bot, message) => {
+    console.log("==========bot======", bot);
+    await bot.replyPrivate(message, "messages saved");
+    await bot.cancelAllDialogs();
+    // await bot.dialogOk();
+    // await bot.dialogError([
+    //   {
+    //     name: "My Dialog",
+    //     error: "there was an error on submission"
+    //   }
+    // ]);
+
+    // call dialogOk or else Slack will think this is an error
   });
 };
