@@ -1,5 +1,6 @@
 const Event = require('../models/event-model');
 const User = require('../models/user-model');
+const Slack = require('../models/slack-model')
 const db = require('../config/db');
 
 module.exports = {
@@ -136,5 +137,32 @@ module.exports = {
     const l = u.map(id => id._id);
     console.log("====u======", l);
     const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
+  },
+  // User slack info added to Slack document
+  slackInfo: async data => {
+    const userInfo = new Slack({
+      slackId: data.user.id,
+      team_id: data.team.id,
+      validated: true,
+    })
+
+    console.log('|---Slackinfo created for database---|', userInfo)
+    let slackAdd = await userInfo.save() 
+
+    const slack_to_User = await User.updateOne(
+      { email: data.user.email },
+      { $push: { slack: slackAdd._id } }
+    )
+
+     //adds the event id to ref on user table
+    // const eventID_to_User = await User.updateOne(
+    //   {
+    //     email: "message.email"
+    //   },
+    //   { $push: { event: dbResponse._id } }
+    // );
+
+    console.log('|---Slackinfo saved---|', slack_to_User)
+    return slackAdd
   }
 };
