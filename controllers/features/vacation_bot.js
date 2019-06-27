@@ -12,6 +12,7 @@ var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
 let block_helper = require("../../routers/interactive_blocks");
+const { SlackDialog } = require("botbuilder-adapter-slack");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -85,7 +86,9 @@ module.exports = function(controller) {
         );
 
         if ((dbResponse.slackID = message.user)) {
-          await bot.replyPrivate(message, "vacation time scheduled!");
+          await bot.replyPrivate(message, {
+            blocks: block_helper.custom_message()
+          });
           delete newDate[message.actions[0].block_id];
           console.log(newDate[message.actions[0].block_id]);
         } else {
@@ -226,7 +229,25 @@ module.exports = function(controller) {
               text: "Delete"
             },
             value: `${dbRespond._id}`,
-            action_id: "button"
+            action_id: "button",
+            confirm: {
+              title: {
+                type: "plain_text",
+                text: "Are you sure?"
+              },
+              text: {
+                type: "mrkdwn",
+                text: "Please double check the date."
+              },
+              confirm: {
+                type: "plain_text",
+                text: "Confirm"
+              },
+              deny: {
+                type: "plain_text",
+                text: "Cancel"
+              }
+            }
           }
         }));
 
@@ -238,5 +259,40 @@ module.exports = function(controller) {
         );
       }
     }
+  });
+
+  controller.on("block_actions", async (bot, message) => {
+    console.log("===========block actions", message);
+    const { value } = message.actions[0];
+
+    if (value === "Use Default Message") {
+      await bot.replyPrivate(
+        message,
+        "Your vacation is scheduled with our default away message"
+      );
+    }
+  });
+
+  controller.on("block_actions", async (bot, message) => {
+    console.log("========message===============", message);
+    let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
+    dialog.addEmail("Message", "name").notifyOnCancel(false);
+
+    await bot.replyWithDialog(message, dialog.asObject());
+  });
+
+  controller.on("dialog_submission", async (bot, message) => {
+    console.log("==========bot======", bot);
+    await bot.replyPrivate(message, "messages saved");
+    await bot.cancelAllDialogs();
+    // await bot.dialogOk();
+    // await bot.dialogError([
+    //   {
+    //     name: "My Dialog",
+    //     error: "there was an error on submission"
+    //   }
+    // ]);
+
+    // call dialogOk or else Slack will think this is an error
   });
 };
