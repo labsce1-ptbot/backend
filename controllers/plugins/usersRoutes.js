@@ -19,12 +19,14 @@ module.exports = function(botkit) {
           try {
             user = req.user;
             // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
+            console.log("<-=-=-=-=- Success! =-=-=-=->\n");
+            return res.status(200).json({ success: true, userInfo: user });
           } catch (err) {
             return res.status(500).json({ success: false });
           }
         }
-        console.log("<-=-=-=-=- Success! =-=-=-=->\n");
-        res.status(200).json({ success: true, userInfo: user });
+        return res.status(500).json({ success: false });
+        // res.status(200).json({ success: true, userInfo: user });
       });
 
       controller.webserver.get("/hey", async (req, res) => {

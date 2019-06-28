@@ -14,8 +14,8 @@ module.exports = controller => {
     helmet(),
     session({
       secret: process.env.secret,
-      saveUninitialized: true,
-      resave: true
+      saveUninitialized: false,
+      resave: false
     }),
     passport.initialize(),
     passport.session()
