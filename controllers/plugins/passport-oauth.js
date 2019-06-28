@@ -43,20 +43,41 @@ module.exports = function(botkit) {
         controller.webserver.get(
           "/auth/callback",
           passport.authenticate("auth0", {
-            successRedirect: "http://localhost:3001/dashboard",
-            failureRedirect: "/failure"
+            successRedirect: `${process.env.REACT_APP_SERVER_URL}`,
+            // "http://localhost:3001/admin/dashboard",
+            failureRedirect: "/"
           })
         );
 
         controller.webserver.get(
           "/auth/login",
-          passport.authenticate("auth0", {}),
-          function(req, res) {
-            res.redirect("/");
-          }
+          passport.authenticate("auth0", {
+            //   successRedirect: "/",
+            //   failureRedirect: "/auth/login"
+            // })
+            function(req, res) {
+              res.redirect("/");
+            }
+          })
         );
 
+<<<<<<< HEAD
+        // Make sure session is ended on logout
+        controller.webserver.post("/auth/logout", (req, res) => {
+          req.logout();
+          // req.session.destroy(() => {
+          //   res.clearCookie("connect.sid", { domain: "localhost", path: "/" });
+          //   res.status(301).send({ success: false });
+          // });
+          req.session.destroy(() => {
+            res.clearCookie("connect.sid");
+            res.status(301).send({ success: false });
+          });
+        });
+
+=======
         
+>>>>>>> b1c4772f9a750f03bae44bc4707308c687c4edaa
         // log the requested url. handy for debugging!
         console.log("REQ: ", req.url);
 

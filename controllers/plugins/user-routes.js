@@ -19,12 +19,19 @@ module.exports = function(botkit) {
           try {
             user = req.user;
             // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
+            console.log("<-=-=-=-=- Success! =-=-=-=->\n");
+            return res.status(200).json({ success: true, userInfo: user });
           } catch (err) {
             return res.status(500).json({ success: false });
           }
         }
+<<<<<<< HEAD:controllers/plugins/usersRoutes.js
+        return res.status(500).json({ success: false });
+        // res.status(200).json({ success: true, userInfo: user });
+=======
         console.log('<-=-=-=-=- Success! =-=-=-=->\n');
         res.status(200).json({ success: true, userInfo: user });
+>>>>>>> b1c4772f9a750f03bae44bc4707308c687c4edaa:controllers/plugins/user-routes.js
       });
 
       // Find User for Populate Endpoint change to events in future
