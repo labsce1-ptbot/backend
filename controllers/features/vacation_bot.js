@@ -262,33 +262,7 @@ module.exports = function(controller) {
     }
   });
 
-  // controller.on("block_actions", async (bot, message) => {
-  //   console.log("===========block actions", message);
-  //   const { value } = message.actions[0];
-
-  //   if (value === "Use Default Message") {
-  //     await bot.replyPrivate(
-  //       message,
-  //       "Your vacation is scheduled with our default away message"
-  //     );
-  //   }
-  // });
-
-  // controller.on("block_actions", async (bot, message) => {
-  //   console.log("========message===============", message);
-
-  //   if (message.actions[0].value === "Custom Message") {
-  //     let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
-  //     dialog
-  //       .addEmail("Message", "name")
-  //       .submit_label("Create Message")
-  //       .notifyOnCancel(false);
-
-  //     await bot.replyWithDialog(message, dialog.asObject());
-  //     console.log();
-  //   }
-  // });
-
+  //dialog prompt for user to leave an away message
   controller.on("block_actions", async (bot, message) => {
     console.log("========message===============", message);
 
@@ -333,6 +307,7 @@ module.exports = function(controller) {
     }
   });
 
+  //dialog submission and save to database
   controller.on("dialog_submission", async (bot, message) => {
     const { conversations, text } = message.submission;
     console.log("==========bot======", message.incoming_message.channelData);
@@ -341,16 +316,9 @@ module.exports = function(controller) {
       msg_for: conversations,
       msg: text
     };
-    // await bot.replyPrivate(message, "messages saved");
+
     console.log("====dialog===", blockId);
 
-    // await bot.dialogOk();
-    // await bot.dialogError([
-    //   {
-    //     name: "My Dialog",
-    //     error: "there was an error on submission"
-    //   }
-    // ]);
     console.log("====dialog===", newDate);
 
     if (
@@ -373,9 +341,7 @@ module.exports = function(controller) {
       const dbResponse = await db.add_date(newDate[blockId]);
 
       if ((dbResponse.slackID = message.user)) {
-        await bot.replyPrivate(message, {
-          blocks: block_helper.custom_message()
-        });
+        await bot.replyPrivate(message, "Your Vacation has been scheduled!");
         delete newDate[blockId];
         console.log(newDate[blockId]);
       } else {
@@ -385,8 +351,3 @@ module.exports = function(controller) {
     await bot.cancelAllDialogs();
   });
 };
-// newDate[`${block_id}`] = {
-//   userID: message.incoming_message.from.id,
-//   start_date: "",
-//   end_date: selected_date
-// };
