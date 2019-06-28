@@ -68,25 +68,6 @@ module.exports = {
             // }
           }
         ]
-      },
-      {
-        type: "divider"
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "Create a custom away message. "
-        },
-        accessory: {
-          type: "button",
-          text: {
-            type: "plain_text",
-            text: "Custom Message",
-            emoji: true
-          },
-          value: "Custom Message"
-        }
       }
     ];
   },

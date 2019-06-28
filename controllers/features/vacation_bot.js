@@ -17,6 +17,7 @@ const { SlackDialog } = require("botbuilder-adapter-slack");
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
   var newDate = {};
+  let blockId;
 
   controller.hears("here", async (bot, message) => {
     console.log("====here====", message);
@@ -33,7 +34,7 @@ module.exports = function(controller) {
       action_id,
       value
     } = message.incoming_message.channelData.actions[0];
-
+    blockId = block_id;
     // Saving start_date to newDate
     if (action_id === "start_date") {
       if (newDate[block_id]) {
@@ -60,42 +61,42 @@ module.exports = function(controller) {
       }
     }
     // Submit button, it will also check if start or end date value is empty before sending.
-    if (value === "Submit") {
-      if (
-        newDate[block_id].start_date === "" ||
-        newDate[block_id].end_date === ""
-      ) {
-        await bot.replyPrivate(message, "Please select a start and end date");
-      } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
-        const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
-          newDate[block_id].start_date
-        ).format("MMMM DD, YYYY")}, end: ${moment(
-          newDate[block_id].end_date
-        ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
+    // if (value === "Submit") {
+    //   if (
+    //     newDate[block_id].start_date === "" ||
+    //     newDate[block_id].end_date === ""
+    //   ) {
+    //     await bot.replyPrivate(message, "Please select a start and end date");
+    //   } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
+    //     const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+    //       newDate[block_id].start_date
+    //     ).format("MMMM DD, YYYY")}, end: ${moment(
+    //       newDate[block_id].end_date
+    //     ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
 
-        await bot.replyPrivate(message, {
-          blocks: block_helper.schedule_vacay(date_error_msg)
-        });
-      } else {
-        console.log(
-          "=============bg===========",
-          newDate[message.actions[0].block_id]
-        );
-        const dbResponse = await db.add_date(
-          newDate[message.actions[0].block_id]
-        );
+    //     await bot.replyPrivate(message, {
+    //       blocks: block_helper.schedule_vacay(date_error_msg)
+    //     });
+    //   } else {
+    //     console.log(
+    //       "=============bg===========",
+    //       newDate[message.actions[0].block_id]
+    //     );
+    //     const dbResponse = await db.add_date(
+    //       newDate[message.actions[0].block_id]
+    //     );
 
-        if ((dbResponse.slackID = message.user)) {
-          await bot.replyPrivate(message, {
-            blocks: block_helper.custom_message()
-          });
-          delete newDate[message.actions[0].block_id];
-          console.log(newDate[message.actions[0].block_id]);
-        } else {
-          await bot.replyPrivate(message, "Vacation denied!");
-        }
-      }
-    }
+    //     if ((dbResponse.slackID = message.user)) {
+    //       await bot.replyPrivate(message, {
+    //         blocks: block_helper.custom_message()
+    //       });
+    //       delete newDate[message.actions[0].block_id];
+    //       console.log(newDate[message.actions[0].block_id]);
+    //     } else {
+    //       await bot.replyPrivate(message, "Vacation denied!");
+    //     }
+    //   }
+    // }
 
     // Temporarily solution to immediately pull data and save to cache.js
     if (message.incoming_message.channelData.actions[0].value === "finding") {
@@ -295,13 +296,14 @@ module.exports = function(controller) {
       let dialog = new SlackDialog(
         "Leave a Custom Message?",
         "Custom Message",
-        "Save",
+        "Submit",
         [
           {
-            label: "Away Message (optional)",
+            label: "Away Message",
             name: "text",
             type: "textarea",
-            max_length: 250
+            max_length: 250,
+            optional: true
           },
 
           // {
@@ -315,24 +317,33 @@ module.exports = function(controller) {
           //   name: "users",
           //   type: "select",
           //   data_source: "users"
-          // },
+          // }
           {
-            label: "Limit who receives custom message (optional)",
+            label: "Limit who receives custom message",
             name: "conversations",
             type: "select",
-            data_source: "conversations"
+            data_source: "conversations",
+            optional: true
           }
         ]
       ).notifyOnCancel(false);
-      console.log("====dialog===", dialog);
+      console.log("====dialog===", blockId);
+      console.log("====dialog===", newDate);
       await bot.replyWithDialog(message, dialog.asObject());
     }
   });
 
   controller.on("dialog_submission", async (bot, message) => {
-    console.log("==========bot======", bot);
-    await bot.replyPrivate(message, "messages saved");
-    await bot.cancelAllDialogs();
+    const { conversations, text } = message.submission;
+    console.log("==========bot======", message.incoming_message.channelData);
+    newDate[blockId] = {
+      ...newDate[blockId],
+      msg_for: conversations,
+      msg: text
+    };
+    // await bot.replyPrivate(message, "messages saved");
+    console.log("====dialog===", blockId);
+
     // await bot.dialogOk();
     // await bot.dialogError([
     //   {
@@ -340,7 +351,42 @@ module.exports = function(controller) {
     //     error: "there was an error on submission"
     //   }
     // ]);
+    console.log("====dialog===", newDate);
 
-    // call dialogOk or else Slack will think this is an error
+    if (
+      newDate[blockId].start_date === "" ||
+      newDate[blockId].end_date === ""
+    ) {
+      await bot.replyPrivate(message, "Please select a start and end date");
+    } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
+      const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+        newDate[blockId].start_date
+      ).format("MMMM DD, YYYY")}, end: ${moment(
+        newDate[blockId].end_date
+      ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
+
+      await bot.replyPrivate(message, {
+        blocks: block_helper.schedule_vacay(date_error_msg)
+      });
+    } else {
+      console.log("=============bg===========", newDate[blockId]);
+      const dbResponse = await db.add_date(newDate[blockId]);
+
+      if ((dbResponse.slackID = message.user)) {
+        await bot.replyPrivate(message, {
+          blocks: block_helper.custom_message()
+        });
+        delete newDate[blockId];
+        console.log(newDate[blockId]);
+      } else {
+        await bot.replyPrivate(message, "Vacation denied!");
+      }
+    }
+    await bot.cancelAllDialogs();
   });
 };
+// newDate[`${block_id}`] = {
+//   userID: message.incoming_message.from.id,
+//   start_date: "",
+//   end_date: selected_date
+// };
