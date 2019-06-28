@@ -56,6 +56,7 @@ module.exports = function(botkit) {
           }
         );
 
+        
         // log the requested url. handy for debugging!
         console.log("REQ: ", req.url);
 
