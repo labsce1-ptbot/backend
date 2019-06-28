@@ -3,11 +3,6 @@
  * Licensed under the MIT License.
  */
 
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
@@ -345,9 +340,10 @@ module.exports = function(controller) {
   //dialog submission and save to database
   controller.on("dialog_submission", async (bot, message) => {
     const { conversations, text } = message.submission;
-    console.log("==========bot======", message.incoming_message.channelData);
+    console.log("==========bot======", message.team.id);
     newDate[blockId] = {
       ...newDate[blockId],
+      teamID: message.team.id,
       msg_for: conversations,
       msg: text
     };
