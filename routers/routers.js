@@ -169,7 +169,7 @@ module.exports = {
     const foundInfo = await Slack.find({ team_id: data.team.id})
     
     // Checking if Slackinfo exists in database
-    if(foundInfo) {
+    if(foundInfo !== []) {
       console.log("|---Slack Info Exists---|", foundInfo)
       return foundInfo
     }
@@ -193,5 +193,5 @@ module.exports = {
     console.log("|---Slackinfo saved---|", slack_to_User);
     return slackAdd;
   },
-  
+
 };
