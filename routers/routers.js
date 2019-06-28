@@ -1,16 +1,14 @@
-
 const Event = require("../models/event-model");
 const User = require("../models/user-model");
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
-
 
 module.exports = {
   // Slack
   add_date: async message => {
     console.log("<----------MESSAGE-------->\n", message);
     console.log("<----Date NOW---->\n", Date.now());
-    const date_string = `${message.start_date}T12:59`;
+    const date_string = `${message.start_date}T00:01:00.000Z`;
 
     event = new Event();
     (event.slackID = message.userID),
@@ -32,7 +30,8 @@ module.exports = {
 
     if (message.msg) {
       messages = new Messages();
-      (messages.recipient = message.msg_for), (messages.message = message.msg);
+      (messages.recipient = message.msg_for),
+        (messages.custom_message = message.msg);
       const save_messages = await messages.save();
 
       const add_event_ref = await Event.updateOne(
@@ -51,30 +50,32 @@ module.exports = {
 
     return dbResponse;
   },
+
   get_date: async () => {
     console.log("<---- GET Date NOW---->\n");
     const y = await Event.find({
       startDate: { $lte: Date.now() },
       endDate: { $gte: Date.now() }
-    });
-    console.log("========y==========", y);
+    }).populate({ path: "message" });
+
+    console.log("=====y=====>\n", y);
     return y;
   },
 
-  searchConflict: async event => {
-    const conflict_array = await Event.find({
-      slackID: event.slackID,
-      $or: [
-        {
-          startDate: { $gte: event.startDate, $lte: event.endDate },
-          endDate: { $gte: event.startDate, $lte: event.endDate }
-        }
-      ]
-    });
+  // searchConflict: async event => {
+  //   const conflict_array = await Event.find({
+  //     slackID: event.slackID,
+  //     $or: [
+  //       {
+  //         startDate: { $gte: event.startDate, $lte: event.endDate },
+  //         endDate: { $gte: event.startDate, $lte: event.endDate }
+  //       }
+  //     ]
+  //   });
 
-    console.log("=======conflict_array=========", conflict_array);
-    return conflict_array;
-  },
+  //   console.log("=======conflict_array=========", conflict_array);
+  //   return conflict_array;
+  // },
 
   showAll: async message => {
     console.log(message.user);
@@ -149,23 +150,24 @@ module.exports = {
     console.log("====u======", l);
     const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
   },
+
   // User slack info added to Slack document
   slackInfo: async data => {
     const userInfo = new Slack({
       slackId: data.user.id,
       team_id: data.team.id,
-      validated: true,
-    })
+      validated: true
+    });
 
-    console.log('|---Slackinfo created for database---|', userInfo)
-    let slackAdd = await userInfo.save() 
+    console.log("|---Slackinfo created for database---|", userInfo);
+    let slackAdd = await userInfo.save();
 
     const slack_to_User = await User.updateOne(
       { email: data.user.email },
       { $push: { slack: slackAdd._id } }
-    )
+    );
 
-     //adds the event id to ref on user table
+    //adds the event id to ref on user table
     // const eventID_to_User = await User.updateOne(
     //   {
     //     email: "message.email"
@@ -173,7 +175,7 @@ module.exports = {
     //   { $push: { event: dbResponse._id } }
     // );
 
-    console.log('|---Slackinfo saved---|', slack_to_User)
-    return slackAdd
+    console.log("|---Slackinfo saved---|", slack_to_User);
+    return slackAdd;
   }
 };

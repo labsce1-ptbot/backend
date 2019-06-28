@@ -164,8 +164,15 @@ module.exports = function(controller) {
   controller.on("message", async (bot, message) => {
     console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
+    const { recipient } = cache[userRegex[0]].message;
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
+      console.log("<--cache reg-->", cache[userRegex[0]]);
+
+      // switch (cache[userRegex[0]]){
+
+      //   case
+      // }
       if (message.channel_type === "group") {
         await bot.startPrivateConversation(message.user);
         await bot.say(

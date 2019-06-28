@@ -6,7 +6,7 @@ const messagesSchema = Schema({
     type: String,
     require: false
   },
-  message: {
+  custom_message: {
     type: String,
     required: true
   }
