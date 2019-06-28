@@ -13,17 +13,18 @@ module.exports = function(botkit) {
     init: function(controller) {
       // add a web route
       controller.webserver.get("/profile", async (req, res) => {
-        console.log("he", res);
+        // console.log("he", res);
         let user;
         if (req.isAuthenticated()) {
           try {
             user = req.user;
-            console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
+            // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
           } catch (err) {
-            return res.status(500).json(err);
+            return res.status(500).json({ success: false });
           }
         }
-        res.status(200).json({ user });
+        console.log("<-=-=-=-=- Success! =-=-=-=->\n");
+        res.status(200).json({ success: true, userInfo: user });
       });
 
       controller.webserver.get("/hey", async (req, res) => {
