@@ -3,17 +3,22 @@ const User = require("../models/user-model");
 const Slack = require("../models/slack-model")
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
+const moment = require("moment");
 
 
 module.exports = {
   // Slack
   add_date: async message => {
     console.log("<----------MESSAGE-------->\n", message);
-    console.log("<----Date NOW---->\n", Date.now());
-    const date_string = `${message.start_date}T00:01:00.000Z`;
+    // console.log(
+    //   "<----Date NOW---->\n",
+    //   moment.tz(message.start_date, "America/New_York").format()
+    // );
+    const date_string = `${message.start_date}T03:01:00.000Z`;
 
     event = new Event();
     (event.slackID = message.userID),
+      (event.teamID = message.teamID),
       (event.startDate = date_string),
       (event.endDate = message.end_date),
       // let conflicts = await searchConflict(event);
