@@ -3,11 +3,6 @@
  * Licensed under the MIT License.
  */
 
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
@@ -164,16 +159,44 @@ module.exports = function(controller) {
   controller.on("message", async (bot, message) => {
     console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
-    const { recipient } = cache[userRegex[0]].message;
+    const { recipient, custom_message } = cache[userRegex[0]].message[0];
+    const { user, channel, channel_type } = message;
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       console.log("<--cache reg-->", cache[userRegex[0]]);
 
-      // switch (cache[userRegex[0]]){
-
-      //   case
-      // }
-      if (message.channel_type === "group") {
+      if (recipient === channel && channel_type === "group") {
+        {
+          await bot.startPrivateConversation(user);
+          await bot.say(custom_message);
+        }
+      } else if (custom_message) {
+        switch (recipient) {
+          case user:
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel && channel_type === "group":
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel:
+            await bot.replyInThread(message, custom_message);
+            break;
+          case null:
+            await bot.replyInThread(message, custom_message);
+            break;
+          default:
+            await bot.replyInThread(
+              message,
+              ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+                moment(cache[`${userRegex[0]}`].start_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+                moment(cache[`${userRegex[0]}`].end_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST>`
+            );
+        }
+      } else if (channel_type === "group") {
         await bot.startPrivateConversation(message.user);
         await bot.say(
           ` <@${userRegex[0]}> is currently on vacation from <!date^` +
@@ -317,9 +340,10 @@ module.exports = function(controller) {
   //dialog submission and save to database
   controller.on("dialog_submission", async (bot, message) => {
     const { conversations, text } = message.submission;
-    console.log("==========bot======", message.incoming_message.channelData);
+    console.log("==========bot======", message.team.id);
     newDate[blockId] = {
       ...newDate[blockId],
+      teamID: message.team.id,
       msg_for: conversations,
       msg: text
     };
@@ -332,7 +356,11 @@ module.exports = function(controller) {
       newDate[blockId].start_date === "" ||
       newDate[blockId].end_date === ""
     ) {
-      await bot.replyPrivate(message, "Please select a start and end date");
+      const error_msg =
+        ":warning: Please select a start and end date :warning:";
+      await bot.replyPrivate(message, {
+        blocks: block_helper.schedule_vacay(error_msg)
+      });
     } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
       const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
         newDate[blockId].start_date
@@ -344,7 +372,6 @@ module.exports = function(controller) {
         blocks: block_helper.schedule_vacay(date_error_msg)
       });
     } else {
-      console.log("=============bg===========", newDate[blockId]);
       const dbResponse = await db.add_date(newDate[blockId]);
 
       if ((dbResponse.slackID = message.user)) {
