@@ -360,7 +360,11 @@ module.exports = function(controller) {
       newDate[blockId].start_date === "" ||
       newDate[blockId].end_date === ""
     ) {
-      await bot.replyPrivate(message, "Please select a start and end date");
+      const error_msg =
+        ":warning: Please select a start and end date :warning:";
+      await bot.replyPrivate(message, {
+        blocks: block_helper.schedule_vacay(error_msg)
+      });
     } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
       const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
         newDate[blockId].start_date
@@ -372,7 +376,6 @@ module.exports = function(controller) {
         blocks: block_helper.schedule_vacay(date_error_msg)
       });
     } else {
-      console.log("=============bg===========", newDate[blockId]);
       const dbResponse = await db.add_date(newDate[blockId]);
 
       if ((dbResponse.slackID = message.user)) {
