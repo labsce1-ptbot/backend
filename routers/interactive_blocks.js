@@ -45,27 +45,27 @@ module.exports = {
               emoji: true
             },
             style: "primary",
-            value: "Submit",
-            confirm: {
-              title: {
-                type: "plain_text",
-                text: "Are you sure?"
-              },
-              text: {
-                type: "mrkdwn",
-                // Trying to output the user selected date
-                // "text": `Start: ${newDate[message.actions[0].block_id].start_date !== undefined ? newDate[message.actions[0].block_id].start_date : "bleh"} to End: ${newDate[message.actions[0].block_id].end_date !== undefined ? newDate[message.actions[0].block_id].end_date : "bleh"}`,
-                text: "Please double check the date."
-              },
-              confirm: {
-                type: "plain_text",
-                text: "Confirm"
-              },
-              deny: {
-                type: "plain_text",
-                text: "Cancel"
-              }
-            }
+            value: "Custom Message"
+            // confirm: {
+            //   title: {
+            //     type: "plain_text",
+            //     text: "Are you sure?"
+            //   },
+            //   text: {
+            //     type: "mrkdwn",
+            //     // Trying to output the user selected date
+            //     // "text": `Start: ${newDate[message.actions[0].block_id].start_date !== undefined ? newDate[message.actions[0].block_id].start_date : "bleh"} to End: ${newDate[message.actions[0].block_id].end_date !== undefined ? newDate[message.actions[0].block_id].end_date : "bleh"}`,
+            //     text: "Please double check the date."
+            //   },
+            //   confirm: {
+            //     type: "plain_text",
+            //     text: "Confirm"
+            //   },
+            //   deny: {
+            //     type: "plain_text",
+            //     text: "Cancel"
+            //   }
+            // }
           }
         ]
       },

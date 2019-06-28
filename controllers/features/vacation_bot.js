@@ -261,24 +261,72 @@ module.exports = function(controller) {
     }
   });
 
-  controller.on("block_actions", async (bot, message) => {
-    console.log("===========block actions", message);
-    const { value } = message.actions[0];
+  // controller.on("block_actions", async (bot, message) => {
+  //   console.log("===========block actions", message);
+  //   const { value } = message.actions[0];
 
-    if (value === "Use Default Message") {
-      await bot.replyPrivate(
-        message,
-        "Your vacation is scheduled with our default away message"
-      );
-    }
-  });
+  //   if (value === "Use Default Message") {
+  //     await bot.replyPrivate(
+  //       message,
+  //       "Your vacation is scheduled with our default away message"
+  //     );
+  //   }
+  // });
+
+  // controller.on("block_actions", async (bot, message) => {
+  //   console.log("========message===============", message);
+
+  //   if (message.actions[0].value === "Custom Message") {
+  //     let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
+  //     dialog
+  //       .addEmail("Message", "name")
+  //       .submit_label("Create Message")
+  //       .notifyOnCancel(false);
+
+  //     await bot.replyWithDialog(message, dialog.asObject());
+  //     console.log();
+  //   }
+  // });
 
   controller.on("block_actions", async (bot, message) => {
     console.log("========message===============", message);
-    let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
-    dialog.addEmail("Message", "name").notifyOnCancel(false);
 
-    await bot.replyWithDialog(message, dialog.asObject());
+    if (message.actions[0].value === "Custom Message") {
+      let dialog = new SlackDialog(
+        "Leave a Custom Message?",
+        "Custom Message",
+        "Save",
+        [
+          {
+            label: "Away Message (optional)",
+            name: "text",
+            type: "textarea",
+            max_length: 250
+          },
+
+          // {
+          //   label: "Limit who receives custom message (channels)",
+          //   name: "channel",
+          //   type: "select",
+          //   data_source: "channels"
+          // },
+          // {
+          //   label: "Limit who receives custom message (users)",
+          //   name: "users",
+          //   type: "select",
+          //   data_source: "users"
+          // },
+          {
+            label: "Limit who receives custom message (optional)",
+            name: "conversations",
+            type: "select",
+            data_source: "conversations"
+          }
+        ]
+      ).notifyOnCancel(false);
+      console.log("====dialog===", dialog);
+      await bot.replyWithDialog(message, dialog.asObject());
+    }
   });
 
   controller.on("dialog_submission", async (bot, message) => {
