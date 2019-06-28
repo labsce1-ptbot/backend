@@ -6,6 +6,10 @@ const eventSchema = Schema({
     type: String,
     required: true
   },
+  teamID: {
+    type: String,
+    required: true
+  },
   startDate: {
     type: Date,
     // default: Date.now()
@@ -15,10 +19,12 @@ const eventSchema = Schema({
     type: Date,
     required: true
   },
-  message: {
-    type: String,
-    required: false
-  }
+  message: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Messages"
+    }
+  ]
 });
 
 Event = module.exports = mongoose.model("Event", eventSchema);

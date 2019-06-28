@@ -9,7 +9,7 @@ module.exports = function() {
   // Deleting users that is not on vacation from database.
 
   // Collecting users from database that is on vacation, runs at 12:01am.
-  cron.schedule("01 00 * * *", async () => {
+  cron.schedule("30 00 * * *", async () => {
     console.log("-------------------------\n");
     console.log("Collecting data from database and saving to cache.js\n");
     const database = await db.get_date();
@@ -17,7 +17,7 @@ module.exports = function() {
       (cache[obj.slackID] = {
         start_date: obj.startDate,
         end_date: obj.endDate,
-        message: obj.message,
+        message: obj.message[0],
         vacation: true
       }),
         {
@@ -51,7 +51,7 @@ module.exports = function() {
   // testing.start();
 
   //removes expired vacations every sunday
-  //   cron.schedule("* 59 22 * * Sun", async () => {
+  //   cron.schedule("01 00 * * *", async () => {
   //     const delete_old = await db.clean_old_vacations();
   //   });
 };

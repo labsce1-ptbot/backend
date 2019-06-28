@@ -14,7 +14,7 @@ let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
 let authSlack = require("./controllers/plugins/slack-auth");
 let session = require("./controllers/plugins/session");
-let userRoutes = require("./controllers/plugins/usersRoutes");
+let userRoutes = require("./controllers/plugins/user-routes");
 
 // Import a platform-specific adapter for slack.
 

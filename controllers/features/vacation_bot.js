@@ -3,11 +3,6 @@
  * Licensed under the MIT License.
  */
 
-/**
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
- */
-
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
@@ -17,6 +12,7 @@ const { SlackDialog } = require("botbuilder-adapter-slack");
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
   var newDate = {};
+  let blockId;
 
   controller.hears("here", async (bot, message) => {
     console.log("====here====", message);
@@ -33,7 +29,7 @@ module.exports = function(controller) {
       action_id,
       value
     } = message.incoming_message.channelData.actions[0];
-
+    blockId = block_id;
     // Saving start_date to newDate
     if (action_id === "start_date") {
       if (newDate[block_id]) {
@@ -60,42 +56,42 @@ module.exports = function(controller) {
       }
     }
     // Submit button, it will also check if start or end date value is empty before sending.
-    if (value === "Submit") {
-      if (
-        newDate[block_id].start_date === "" ||
-        newDate[block_id].end_date === ""
-      ) {
-        await bot.replyPrivate(message, "Please select a start and end date");
-      } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
-        const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
-          newDate[block_id].start_date
-        ).format("MMMM DD, YYYY")}, end: ${moment(
-          newDate[block_id].end_date
-        ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
+    // if (value === "Submit") {
+    //   if (
+    //     newDate[block_id].start_date === "" ||
+    //     newDate[block_id].end_date === ""
+    //   ) {
+    //     await bot.replyPrivate(message, "Please select a start and end date");
+    //   } else if (newDate[block_id].start_date > newDate[block_id].end_date) {
+    //     const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+    //       newDate[block_id].start_date
+    //     ).format("MMMM DD, YYYY")}, end: ${moment(
+    //       newDate[block_id].end_date
+    //     ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
 
-        await bot.replyPrivate(message, {
-          blocks: block_helper.schedule_vacay(date_error_msg)
-        });
-      } else {
-        console.log(
-          "=============bg===========",
-          newDate[message.actions[0].block_id]
-        );
-        const dbResponse = await db.add_date(
-          newDate[message.actions[0].block_id]
-        );
+    //     await bot.replyPrivate(message, {
+    //       blocks: block_helper.schedule_vacay(date_error_msg)
+    //     });
+    //   } else {
+    //     console.log(
+    //       "=============bg===========",
+    //       newDate[message.actions[0].block_id]
+    //     );
+    //     const dbResponse = await db.add_date(
+    //       newDate[message.actions[0].block_id]
+    //     );
 
-        if ((dbResponse.slackID = message.user)) {
-          await bot.replyPrivate(message, {
-            blocks: block_helper.custom_message()
-          });
-          delete newDate[message.actions[0].block_id];
-          console.log(newDate[message.actions[0].block_id]);
-        } else {
-          await bot.replyPrivate(message, "Vacation denied!");
-        }
-      }
-    }
+    //     if ((dbResponse.slackID = message.user)) {
+    //       await bot.replyPrivate(message, {
+    //         blocks: block_helper.custom_message()
+    //       });
+    //       delete newDate[message.actions[0].block_id];
+    //       console.log(newDate[message.actions[0].block_id]);
+    //     } else {
+    //       await bot.replyPrivate(message, "Vacation denied!");
+    //     }
+    //   }
+    // }
 
     // Temporarily solution to immediately pull data and save to cache.js
     if (message.incoming_message.channelData.actions[0].value === "finding") {
@@ -163,9 +159,44 @@ module.exports = function(controller) {
   controller.on("message", async (bot, message) => {
     console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
+    const { recipient, custom_message } = cache[userRegex[0]].message[0];
+    const { user, channel, channel_type } = message;
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      if (message.channel_type === "group") {
+      console.log("<--cache reg-->", cache[userRegex[0]]);
+
+      if (recipient === channel && channel_type === "group") {
+        {
+          await bot.startPrivateConversation(user);
+          await bot.say(custom_message);
+        }
+      } else if (custom_message) {
+        switch (recipient) {
+          case user:
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel && channel_type === "group":
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel:
+            await bot.replyInThread(message, custom_message);
+            break;
+          case null:
+            await bot.replyInThread(message, custom_message);
+            break;
+          default:
+            await bot.replyInThread(
+              message,
+              ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+                moment(cache[`${userRegex[0]}`].start_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+                moment(cache[`${userRegex[0]}`].end_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST>`
+            );
+        }
+      } else if (channel_type === "group") {
         await bot.startPrivateConversation(message.user);
         await bot.say(
           ` <@${userRegex[0]}> is currently on vacation from <!date^` +
@@ -261,38 +292,96 @@ module.exports = function(controller) {
     }
   });
 
+  //dialog prompt for user to leave an away message
   controller.on("block_actions", async (bot, message) => {
-    console.log("===========block actions", message);
-    const { value } = message.actions[0];
+    console.log("========message===============", message);
 
-    if (value === "Use Default Message") {
-      await bot.replyPrivate(
-        message,
-        "Your vacation is scheduled with our default away message"
-      );
+    if (message.actions[0].value === "Custom Message") {
+      let dialog = new SlackDialog(
+        "Leave a Custom Message?",
+        "Custom Message",
+        "Submit",
+        [
+          {
+            label: "Away Message",
+            name: "text",
+            type: "textarea",
+            max_length: 250,
+            optional: true
+          },
+
+          // {
+          //   label: "Limit who receives custom message (channels)",
+          //   name: "channel",
+          //   type: "select",
+          //   data_source: "channels"
+          // },
+          // {
+          //   label: "Limit who receives custom message (users)",
+          //   name: "users",
+          //   type: "select",
+          //   data_source: "users"
+          // }
+          {
+            label: "Limit who receives custom message",
+            name: "conversations",
+            type: "select",
+            data_source: "conversations",
+            optional: true
+          }
+        ]
+      ).notifyOnCancel(false);
+      console.log("====dialog===", blockId);
+      console.log("====dialog===", newDate);
+      await bot.replyWithDialog(message, dialog.asObject());
     }
   });
 
-  controller.on("block_actions", async (bot, message) => {
-    console.log("========message===============", message);
-    let dialog = new SlackDialog("My Dialog", "Custom Message", "Save");
-    dialog.addEmail("Message", "name").notifyOnCancel(false);
-
-    await bot.replyWithDialog(message, dialog.asObject());
-  });
-
+  //dialog submission and save to database
   controller.on("dialog_submission", async (bot, message) => {
-    console.log("==========bot======", bot);
-    await bot.replyPrivate(message, "messages saved");
-    await bot.cancelAllDialogs();
-    // await bot.dialogOk();
-    // await bot.dialogError([
-    //   {
-    //     name: "My Dialog",
-    //     error: "there was an error on submission"
-    //   }
-    // ]);
+    const { conversations, text } = message.submission;
+    console.log("==========bot======", message.team.id);
+    newDate[blockId] = {
+      ...newDate[blockId],
+      teamID: message.team.id,
+      msg_for: conversations,
+      msg: text
+    };
 
-    // call dialogOk or else Slack will think this is an error
+    console.log("====dialog===", blockId);
+
+    console.log("====dialog===", newDate);
+
+    if (
+      newDate[blockId].start_date === "" ||
+      newDate[blockId].end_date === ""
+    ) {
+      const error_msg =
+        ":warning: Please select a start and end date :warning:";
+      await bot.replyPrivate(message, {
+        blocks: block_helper.schedule_vacay(error_msg)
+      });
+    } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
+      const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+        newDate[blockId].start_date
+      ).format("MMMM DD, YYYY")}, end: ${moment(
+        newDate[blockId].end_date
+      ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
+
+      await bot.replyPrivate(message, {
+        blocks: block_helper.schedule_vacay(date_error_msg)
+      });
+    } else {
+      const dbResponse = await db.add_date(newDate[blockId]);
+
+      if ((dbResponse.slackID = message.user)) {
+        await bot.replyPrivate(message, "Your Vacation has been scheduled!");
+        delete newDate[blockId];
+        console.log(newDate[blockId]);
+      } else {
+        await bot.replyPrivate(message, "Vacation denied!");
+      }
+    }
+    await bot.cancelAllDialogs();
   });
 };
