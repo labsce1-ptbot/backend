@@ -17,7 +17,7 @@ module.exports = function() {
       (cache[obj.slackID] = {
         start_date: obj.startDate,
         end_date: obj.endDate,
-        message: obj.message,
+        message: obj.message[0],
         vacation: true
       }),
         {
