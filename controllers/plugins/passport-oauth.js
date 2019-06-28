@@ -1,14 +1,14 @@
-const moment = require('moment');
-const User = require('../../routers/routers');
-const Auth0Strategy = require('passport-auth0');
-const passport = require('passport');
-require('dotenv').config();
+const moment = require("moment");
+const User = require("../../routers/routers");
+const Auth0Strategy = require("passport-auth0");
+const passport = require("passport");
+require("dotenv").config();
 // const authRoutes = require("./auth0");
 
 module.exports = function(botkit) {
   return {
     // The name of the plugin. Used to log messages at boot time.
-    name: 'passport-oauth.js',
+    name: "passport-oauth.js",
     // initialize this module. called at load time.
     init: function(controller) {
       function authRoutes(req, res, next) {
@@ -41,52 +41,30 @@ module.exports = function(botkit) {
         passport.deserializeUser((profile, done) => done(null, profile));
 
         controller.webserver.get(
-          '/auth/callback',
-          passport.authenticate('auth0', {
-            successRedirect: '/logged',
-            failureRedirect: '/failure',
+          "/auth/callback",
+          passport.authenticate("auth0", {
+            successRedirect: "http://localhost:3001/dashboard",
+            failureRedirect: "/failure"
           })
         );
 
         controller.webserver.get(
-          '/auth/login',
-          passport.authenticate('auth0', {}),
+          "/auth/login",
+          passport.authenticate("auth0", {}),
           function(req, res) {
-            res.redirect('/');
+            res.redirect("/");
           }
         );
 
-        controller.webserver.get("/auth/logout", (req, res) => {
-          req.logout();
-          res.redirect("/");
-        });
-
         // log the requested url. handy for debugging!
-        console.log('REQ: ', req.url);
+        console.log("REQ: ", req.url);
 
         // call next or else the request will be intercepted
         next();
       }
 
       // add a web route
-      controller.webserver.use('/auth', authRoutes);
-
-      //   controller.webserver.get(
-      //     "auth/callback",
-      //     passport.authenticate("auth0", {
-      //       successRedirect: "localhost:3000/logged",
-      //       failureRedirect: "localhost:3000/failure"
-      //     })
-      //   );
-
-      //   controller.webserver.get(
-      //     "auth/login",
-      //     passport.authenticate("auth0", {}),
-      //     function(req, res) {
-      //       console.log("we got something here");
-      //       res.redirect("/");
-      //     }
-      //   );
+      controller.webserver.use("/auth", authRoutes);
 
       // controller.webserver.get("/logged", (req, res) => {
       //   res.send("Successfully Worked as far as authenticating");
@@ -95,6 +73,6 @@ module.exports = function(botkit) {
       // controller.webserver.get("/failure", (req, res) => {
       //   res.send("Failure to authenticate");
       // });
-    },
+    }
   };
 };
