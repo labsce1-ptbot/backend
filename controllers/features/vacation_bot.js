@@ -164,16 +164,44 @@ module.exports = function(controller) {
   controller.on("message", async (bot, message) => {
     console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
-    const { recipient } = cache[userRegex[0]].message;
+    const { recipient, custom_message } = cache[userRegex[0]].message[0];
+    const { user, channel, channel_type } = message;
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       console.log("<--cache reg-->", cache[userRegex[0]]);
 
-      // switch (cache[userRegex[0]]){
-
-      //   case
-      // }
-      if (message.channel_type === "group") {
+      if (recipient === channel && channel_type === "group") {
+        {
+          await bot.startPrivateConversation(user);
+          await bot.say(custom_message);
+        }
+      } else if (custom_message) {
+        switch (recipient) {
+          case user:
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel && channel_type === "group":
+            await bot.startPrivateConversation(user);
+            await bot.say(custom_message);
+            break;
+          case channel:
+            await bot.replyInThread(message, custom_message);
+            break;
+          case null:
+            await bot.replyInThread(message, custom_message);
+            break;
+          default:
+            await bot.replyInThread(
+              message,
+              ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+                moment(cache[`${userRegex[0]}`].start_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+                moment(cache[`${userRegex[0]}`].end_date).unix() +
+                `^{date_long}|Posted 2014-02-18 PST>`
+            );
+        }
+      } else if (channel_type === "group") {
         await bot.startPrivateConversation(message.user);
         await bot.say(
           ` <@${userRegex[0]}> is currently on vacation from <!date^` +
