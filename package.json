@@ -5,6 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "start": "node ./bot.js",
+    "server": "nodemon ./bot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -24,12 +25,12 @@
     "mongoose": "^5.5.12",
     "morgan": "^1.9.1",
     "node-cron": "^2.0.3",
-    "nodemon": "^1.19.1",
     "passport": "^0.4.0",
     "passport-auth0": "^1.1.0",
     "passport-slack": "0.0.7"
   },
   "devDependencies": {
+    "nodemon": "^1.19.1",
     "app-root-dir": "^1.0.2",
     "mongoose-seed": "^0.6.0"
   }
