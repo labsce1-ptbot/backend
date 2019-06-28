@@ -8,7 +8,7 @@ module.exports = controller => {
   controller.webserver.use(
     express.json(),
     cors({
-      origin: process.env.ORIGIN || "http://localhost:3000",
+      origin: process.env.ORIGIN || "http://localhost:3001",
       credentials: true
     }),
     helmet(),
