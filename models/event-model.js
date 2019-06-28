@@ -6,6 +6,10 @@ const eventSchema = Schema({
     type: String,
     required: true
   },
+  teamID: {
+    type: String,
+    required: true
+  },
   startDate: {
     type: Date,
     // default: Date.now()

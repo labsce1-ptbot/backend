@@ -1,7 +1,9 @@
 const Event = require("../models/event-model");
 const User = require("../models/user-model");
+const Slack = require("../models/slack-model")
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
+
 
 module.exports = {
   // Slack
@@ -159,6 +161,14 @@ module.exports = {
       validated: true
     });
 
+    const foundInfo = await Slack.find({ team_id: data.team.id})
+    
+    // Checking if Slackinfo exists in database
+    if(foundInfo) {
+      console.log("|---Slack Info Exists---|", foundInfo)
+      return foundInfo
+    }
+    
     console.log("|---Slackinfo created for database---|", userInfo);
     let slackAdd = await userInfo.save();
 
@@ -177,5 +187,6 @@ module.exports = {
 
     console.log("|---Slackinfo saved---|", slack_to_User);
     return slackAdd;
-  }
+  },
+  
 };

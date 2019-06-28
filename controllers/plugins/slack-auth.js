@@ -1,7 +1,6 @@
 const passport = require('passport')
 const request = require('request')
 const Slack = require('../../routers/routers')
-const User = require('../../models/user-model')
 
 module.exports = (botkit) => {
   return {
@@ -31,8 +30,7 @@ module.exports = (botkit) => {
           request.get(url, (err, httpResponse, body) => {
             let data = JSON.parse(body)
             console.log("|---Slack Response----|\n", data)
-            console.log(req.session)
-
+            
             // Figure out how to manage token. Store in database or not?
             req.session.passport.user.access_token = data.access_token
             Slack.slackInfo(data)
@@ -48,19 +46,8 @@ module.exports = (botkit) => {
           res.redirect('/');
         });
         console.log('REQ:', req.url)
-        
         next();
         } 
-
-        // Find User for Populate Endpoint change to events in future
-        controller.webserver.get('/slack/info', async (req, res) => {
-          console.log('|--- Slack-info Endpoint---|\n', req.user)
-          const findUser = await User.findOne({
-            email: req.user[0].email,
-          }).populate('slack').exec((err, info) => {
-            console.log("Slack Info:", info)
-          })
-        })
 
         controller.webserver.use('/slack', slackAuthRoutes);
       }
