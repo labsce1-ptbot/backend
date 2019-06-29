@@ -61,7 +61,6 @@ module.exports = function(botkit) {
           })
         );
 
-<<<<<<< HEAD
         // Make sure session is ended on logout
         controller.webserver.post("/auth/logout", (req, res) => {
           req.logout();
@@ -75,9 +74,6 @@ module.exports = function(botkit) {
           });
         });
 
-=======
-        
->>>>>>> b1c4772f9a750f03bae44bc4707308c687c4edaa
         // log the requested url. handy for debugging!
         console.log("REQ: ", req.url);
 
