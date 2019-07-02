@@ -1,14 +1,9 @@
 const NodeCron = require("../../config/node-con");
 // const botkitRouter = require("../../routers/botkitRouter");
-<<<<<<< HEAD
 const bodyParser = require('body-parser');
 const User = require('../../models/user-model')
 const Event = require('../../models/event-model')
 
-=======
-const bodyParser = require("body-parser");
-const User = require("../../models/user-model");
->>>>>>> 991c44a541b7a9b1ecdddf62fc2222c8f51ddaca
 
 module.exports = function(botkit) {
   // NodeCron();
@@ -38,7 +33,7 @@ module.exports = function(botkit) {
       // Find User for Populate Endpoint change to events in future
       controller.webserver.get("/info", async (req, res) => {
         console.log("|--- Slack-info Endpoint---|\n", req.user);
-        const findUser = await User.findOne({
+        await User.findOne({
           email: req.user[0].email
         })
           .populate('slack')
@@ -46,7 +41,7 @@ module.exports = function(botkit) {
             console.log('Slack Info:\n', info);
             console.log('|---Access---|\n', info.slack[0].team_id)
             
-            const findEvent = await Event.find({
+           await Event.find({
               teamID: info.slack[0].team_id,
               slackID: info.slack[0].slackId,
             }).populate('message').exec((err, event) => {
