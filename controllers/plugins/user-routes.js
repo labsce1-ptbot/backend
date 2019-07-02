@@ -2,6 +2,7 @@ const NodeCron = require('../../config/node-con');
 // const botkitRouter = require("../../routers/botkitRouter");
 const bodyParser = require('body-parser');
 const User = require('../../models/user-model')
+const Event = require('../../models/event-model')
 
 
 module.exports = function(botkit) {
@@ -34,9 +35,19 @@ module.exports = function(botkit) {
           email: req.user[0].email,
         })
           .populate('slack')
-          .exec((err, info) => {
+          .exec(async (err, info) => {
             console.log('Slack Info:\n', info);
+            console.log('|---Access---|\n', info.slack[0].team_id)
+            
+            const findEvent = await Event.find({
+              teamID: info.slack[0].team_id,
+              slackID: info.slack[0].slackId,
+            }).populate('message').exec((err, event) => {
+              console.log("|---Event Info---|\n", event)
+              res.send(event)
+            })
           });
+
       });
 
       // controller.webserver.get("/users", (req, res) => {
