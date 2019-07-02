@@ -159,42 +159,43 @@ module.exports = function(controller) {
   controller.on("message", async (bot, message) => {
     console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
-    const { recipient, custom_message } = cache[userRegex[0]].message[0];
+
     const { user, channel, channel_type } = message;
+    console.log("<--cache reg-->", cache[userRegex[0]]);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       console.log("<--cache reg-->", cache[userRegex[0]]);
 
-      if (recipient === channel && channel_type === "group") {
-        {
-          await bot.startPrivateConversation(user);
-          await bot.say(custom_message);
-        }
-      } else if (custom_message) {
-        switch (recipient) {
-          case user:
+      if (cache[userRegex[0]].message.length > 0) {
+        const { recipient, custom_message } = cache[userRegex[0]].message[0];
+        if (recipient === channel && channel_type === "group") {
+          {
             await bot.startPrivateConversation(user);
             await bot.say(custom_message);
-            break;
-          case channel && channel_type === "group":
-            await bot.startPrivateConversation(user);
-            await bot.say(custom_message);
-            break;
-          case channel:
-            await bot.replyInThread(message, custom_message);
-            break;
-          case null:
-            await bot.replyInThread(message, custom_message);
-            break;
-          default:
-            await bot.replyInThread(
-              message,
-              ` <@${userRegex[0]}> is currently on vacation from <!date^` +
-                moment(cache[`${userRegex[0]}`].start_date).unix() +
-                `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
-                moment(cache[`${userRegex[0]}`].end_date).unix() +
-                `^{date_long}|Posted 2014-02-18 PST>`
-            );
+          }
+        } else if (custom_message) {
+          switch (recipient) {
+            case user:
+              await bot.startPrivateConversation(user);
+              await bot.say(custom_message);
+              break;
+
+            case channel:
+              await bot.replyInThread(message, custom_message);
+              break;
+            case null:
+              await bot.replyInThread(message, custom_message);
+              break;
+            default:
+              await bot.replyInThread(
+                message,
+                ` <@${userRegex[0]}> is currently on vacation from <!date^` +
+                  moment(cache[`${userRegex[0]}`].start_date).unix() +
+                  `^{date_long}|Posted 2014-02-18 PST> until <!date^` +
+                  moment(cache[`${userRegex[0]}`].end_date).unix() +
+                  `^{date_long}|Posted 2014-02-18 PST>`
+              );
+          }
         }
       } else if (channel_type === "group") {
         await bot.startPrivateConversation(message.user);
