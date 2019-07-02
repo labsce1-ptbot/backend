@@ -1,15 +1,14 @@
-const Event = require("../models/event-model");
-const User = require("../models/user-model");
-const Slack = require("../models/slack-model")
-const db = require("../config/db");
-const Messages = require("../models/messages-model");
-const moment = require("moment");
-
+const Event = require('../models/event-model');
+const User = require('../models/user-model');
+const Slack = require('../models/slack-model');
+const db = require('../config/db');
+const Messages = require('../models/messages-model');
+const moment = require('moment');
 
 module.exports = {
   // Slack
   add_date: async message => {
-    console.log("<----------MESSAGE-------->\n", message);
+    console.log('<----------MESSAGE-------->\n', message);
     // console.log(
     //   "<----Date NOW---->\n",
     //   moment.tz(message.start_date, "America/New_York").format()
@@ -31,9 +30,9 @@ module.exports = {
       //   return conflicts;
       // }
 
-      console.log("<-----EVENT------>", event);
+      console.log('<-----EVENT------>', event);
     const dbResponse = await event.save();
-    console.log("<-----db------>", dbResponse);
+    console.log('<-----db------>', dbResponse);
 
     if (message.msg) {
       messages = new Messages();
@@ -59,13 +58,13 @@ module.exports = {
   },
 
   get_date: async () => {
-    console.log("<---- GET Date NOW---->\n");
+    console.log('<---- GET Date NOW---->\n');
     const y = await Event.find({
       startDate: { $lte: Date.now() },
-      endDate: { $gte: Date.now() }
-    }).populate({ path: "message" });
+      endDate: { $gte: Date.now() },
+    }).populate({ path: 'message' });
 
-    console.log("=====y=====>\n", y);
+    console.log('=====y=====>\n', y);
     return y;
   },
 
@@ -87,7 +86,7 @@ module.exports = {
   showAll: async message => {
     console.log(message.user);
     const all_msgs = await Event.find({
-      slackID: message.user
+      slackID: message.user,
     });
     console.log(all_msgs);
     return all_msgs;
@@ -108,7 +107,7 @@ module.exports = {
   // Auth
   findUser: async profile => {
     let foundUser = await User.find({ email: profile.email });
-    console.log("--------FindUser--------\n", foundUser);
+    console.log('--------FindUser--------\n', foundUser);
     if (foundUser !== []) {
       return foundUser;
     } else {
@@ -120,14 +119,14 @@ module.exports = {
       err,
       docs
     ) {
-      console.log("error: ", err);
+      console.log('error: ', err);
     });
     console.log(
-      "<-=-=-=-= foundUser before if statement =-=-=-=-=->\n",
+      '<-=-=-=-= foundUser before if statement =-=-=-=-=->\n',
       foundUser
     );
     if (foundUser.length > 0) {
-      console.log("<-=-=-=-=- foundUser =-=-=-=->\n", foundUser);
+      console.log('<-=-=-=-=- foundUser =-=-=-=->\n', foundUser);
       return foundUser;
     }
 
@@ -136,13 +135,13 @@ module.exports = {
       first_name: profile.given_name,
       last_name: profile.family_name,
       email: profile.email,
-      picture: profile.picture
+      picture: profile.picture,
     });
 
-    console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
+    console.log('<---=-=-=-=- NEWUSER =-=-=--->\n', newUser);
 
     let userAdd = await newUser.save();
-    console.log("<-=-=-== userADD =-=-=-=-=->\n", userAdd);
+    console.log('<-=-=-== userADD =-=-=-=-=->\n', userAdd);
     // return new_user
     return userAdd;
   },
@@ -154,7 +153,7 @@ module.exports = {
     const u = await Event.find({ endDate: { $lt: Date.now() } });
 
     const l = u.map(id => id._id);
-    console.log("====u======", l);
+    console.log('====u======', l);
     const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
   },
 
@@ -163,18 +162,18 @@ module.exports = {
     const userInfo = new Slack({
       slackId: data.user.id,
       team_id: data.team.id,
-      validated: true
+      validated: true,
     });
 
-    const foundInfo = await Slack.find({ team_id: data.team.id})
-    
+    const foundInfo = await Slack.find({ team_id: data.team.id });
+
     // Checking if Slackinfo exists in database
-    if(foundInfo !== []) {
-      console.log("|---Slack Info Exists---|", foundInfo)
-      return foundInfo
+    if (foundInfo.length > 0) {
+      console.log('|---Slack Info Exists---|', foundInfo);
+      return foundInfo;
     }
-    
-    console.log("|---Slackinfo created for database---|", userInfo);
+
+    console.log('|---Slackinfo created for database---|', userInfo);
     let slackAdd = await userInfo.save();
 
     const slack_to_User = await User.updateOne(
@@ -190,8 +189,7 @@ module.exports = {
     //   { $push: { event: dbResponse._id } }
     // );
 
-    console.log("|---Slackinfo saved---|", slack_to_User);
+    console.log('|---Slackinfo saved---|', slack_to_User);
     return slackAdd;
   },
-
 };

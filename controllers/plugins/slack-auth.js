@@ -30,9 +30,9 @@ module.exports = (botkit) => {
           request.get(url, (err, httpResponse, body) => {
             let data = JSON.parse(body)
             console.log("|---Slack Response----|\n", data)
-            
+            // data.user.id for slackId
             // Figure out how to manage token. Store in database or not?
-            req.session.passport.user.access_token = data.access_token
+            // req.session.passport.user.access_token = data.access_token
             Slack.slackInfo(data)
             console.log(`|---Updated Req User with Token---|`, user)
             req.session.save((err) => {console.log("|---Error on session save---|", err)})
