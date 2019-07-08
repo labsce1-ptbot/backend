@@ -1,9 +1,8 @@
 const NodeCron = require("../../config/node-con");
 // const botkitRouter = require("../../routers/botkitRouter");
-const bodyParser = require('body-parser');
-const User = require('../../models/user-model')
-const Event = require('../../models/event-model')
-
+const bodyParser = require("body-parser");
+const User = require("../../models/user-model");
+const Event = require("../../models/event-model");
 
 module.exports = function(botkit) {
   // NodeCron();
@@ -36,20 +35,48 @@ module.exports = function(botkit) {
         await User.findOne({
           email: req.user[0].email
         })
-          .populate('slack')
+          .populate("slack")
           .exec(async (err, info) => {
-            console.log('Slack Info:\n', info);
-            console.log('|---Access---|\n', info.slack[0].team_id)
-            
-           await Event.find({
-              teamID: info.slack[0].team_id,
-              slackID: info.slack[0].slackId,
-            }).populate('message').exec((err, event) => {
-              console.log("|---Event Info---|\n", event)
-              res.send(event)
-            })
-          });
+            console.log("Slack Info:\n", info);
+            console.log("|---Access---|\n", info.slack[0].team_id);
 
+            await Event.find({
+              teamID: info.slack[0].team_id,
+              slackID: info.slack[0].slackId
+            })
+              .populate("message")
+              .exec((err, event) => {
+                console.log("|---Event Info---|\n", event);
+                res.send(event);
+              });
+          });
+      });
+
+      controller.webserver.get("/info/:id", async (req, res) => {
+        const { id } = req.params;
+        console.log("|--- req.params---|\n", req.params);
+        await User.findOne({
+          _id: id
+        })
+          .populate("slack")
+          .exec(async (err, info) => {
+            console.log("Slack Info:\n", info);
+            console.log("|---Access---|\n", info.slack[0].team_id);
+
+            await Event.find({
+              teamID: info.slack[0].team_id,
+              slackID: info.slack[0].slackId
+            })
+              .populate("message")
+              .exec((err, event) => {
+                console.log("|---Event Info---|\n", event);
+                res.send(event);
+              });
+          });
+      });
+
+      controller.webserver.post("/add/new", async (req, res) => {
+        console.log("---------heyo-----", req.body);
       });
 
       // controller.webserver.get("/users", (req, res) => {

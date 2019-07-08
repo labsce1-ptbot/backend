@@ -43,7 +43,9 @@ module.exports = function(botkit) {
         controller.webserver.get(
           "/auth/callback",
           passport.authenticate("auth0", {
-            successRedirect: "http://localhost:3001/admin/dashboard" || `${process.env.REACT_APP_SERVER_URL}`,
+            successRedirect:
+              "http://localhost:3001/admin/dashboard" ||
+              `${process.env.REACT_APP_SERVER_URL}`,
             failureRedirect: "/"
           })
         );
