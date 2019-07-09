@@ -38,7 +38,7 @@ module.exports = (botkit) => {
             req.session.save((err) => {console.log("|---Error on session save---|", err)})
             res.end()
           })
-          res.send("Got user data, exchange for token now")
+          res.redirect("/info")
         })
 
         controller.webserver.get('/slack/logout', (req, res) => {
