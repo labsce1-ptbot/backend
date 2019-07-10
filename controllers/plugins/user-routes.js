@@ -3,6 +3,7 @@ const NodeCron = require("../../config/node-con");
 const bodyParser = require("body-parser");
 const User = require("../../models/user-model");
 const Event = require("../../models/event-model");
+const db = require("../../routers/routers");
 
 module.exports = function(botkit) {
   // NodeCron();
@@ -76,7 +77,12 @@ module.exports = function(botkit) {
       });
 
       controller.webserver.post("/add/new", async (req, res) => {
-        console.log("---------heyo-----", req.body);
+        try {
+          const vacation_added = await db.add_date(req.body);
+          return res.status(200).json({ vacation_added });
+        } catch (err) {
+          return res.status(500).json({ message: err });
+        }
       });
 
       // controller.webserver.get("/users", (req, res) => {
