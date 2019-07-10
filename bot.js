@@ -91,7 +91,7 @@ controller.ready(() => {
   controller.usePlugin(session);
   controller.usePlugin(userRoutes);
   controller.usePlugin(authSlack);
-  controller.userPlugin(googleCal);
+  controller.usePlugin(googleCal);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {

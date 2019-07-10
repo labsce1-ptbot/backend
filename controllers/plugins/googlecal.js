@@ -5,9 +5,11 @@ module.exports = function(botkit) {
      // initialize this module. called at load time.
   init: function(controller) {
 
+    controller.webserver.get("/googlecal/user", (req, res) => {
+      res.send("Testing endpoint")
+    })
     // add a web route
     controller.webserver.use("/googlecal", authRoutes);
   }
-
   }
 }
