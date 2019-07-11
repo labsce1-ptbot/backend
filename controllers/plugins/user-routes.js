@@ -55,22 +55,18 @@ module.exports = function(botkit) {
 
       controller.webserver.get("/info/:id", async (req, res) => {
         const { id } = req.params;
-        console.log("|--- req.params---|\n", req.params);
+
         await User.findOne({
           _id: id
         })
           .populate("slack")
           .exec(async (err, info) => {
-            console.log("Slack Info:\n", info);
-            console.log("|---Access---|\n", info.slack[0].team_id);
-
             await Event.find({
               teamID: info.slack[0].team_id,
               slackID: info.slack[0].slackId
             })
               .populate("message")
               .exec((err, event) => {
-                console.log("|---Event Info---|\n", event);
                 res.send(event);
               });
           });
