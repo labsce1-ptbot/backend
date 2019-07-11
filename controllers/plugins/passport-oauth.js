@@ -23,7 +23,7 @@ module.exports = function(botkit) {
             async (accessToken, refreshToken, extraParams, profile, done) => {
               let user;
               profile.accessToken = accessToken;
-              profile.refreshtoken = refreshToken;
+              profile.refreshToken = refreshToken;
               profile.expiresIn = extraParams.expires_in;
               profile.expires = moment().add(profile.expiresIn, "s");
               console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
