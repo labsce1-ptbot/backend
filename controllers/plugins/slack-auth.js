@@ -36,11 +36,11 @@ module.exports = (botkit) => {
             Slack.slackInfo(data)
             console.log(`|---Updated Req User with Token---|`, user)
             req.session.save((err) => {console.log("|---Error on session save---|", err)})
-            res.end()
           })
-          res.send("Got user data, exchange for token now")
+          res.redirect("http://localhost:3001/admin/vacations" || `${process.env.ORIGIN}/admin/vacations`)
         })
 
+        
         controller.webserver.get('/slack/logout', (req, res) => {
           req.logout();
           res.redirect('/');

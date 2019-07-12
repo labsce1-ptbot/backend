@@ -15,6 +15,7 @@ let passportOAuth = require("./controllers/plugins/passport-oauth");
 let authSlack = require("./controllers/plugins/slack-auth");
 let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/user-routes");
+let googleCal = require("./controllers/plugins/googlecal")
 
 // Import a platform-specific adapter for slack.
 
@@ -89,7 +90,8 @@ controller.ready(() => {
   controller.usePlugin(passportOAuth);
   controller.usePlugin(session);
   controller.usePlugin(userRoutes);
-  controller.usePlugin(authSlack)
+  controller.usePlugin(authSlack);
+  controller.usePlugin(googleCal);
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {

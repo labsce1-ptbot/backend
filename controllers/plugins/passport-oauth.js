@@ -3,7 +3,6 @@ const User = require("../../routers/routers");
 const Auth0Strategy = require("passport-auth0");
 const passport = require("passport");
 require("dotenv").config();
-// const authRoutes = require("./auth0");
 
 module.exports = function(botkit) {
   return {
@@ -23,7 +22,7 @@ module.exports = function(botkit) {
             async (accessToken, refreshToken, extraParams, profile, done) => {
               let user;
               profile.accessToken = accessToken;
-              profile.refreshtoken = refreshToken;
+              profile.refreshToken = refreshToken;
               profile.expiresIn = extraParams.expires_in;
               profile.expires = moment().add(profile.expiresIn, "s");
               console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
