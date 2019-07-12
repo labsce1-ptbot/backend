@@ -40,6 +40,7 @@ module.exports = (botkit) => {
           res.redirect("http://localhost:3001/admin/vacations" || `${process.env.ORIGIN}/admin/vacations`)
         })
 
+        
         controller.webserver.get('/slack/logout', (req, res) => {
           req.logout();
           res.redirect('/');
