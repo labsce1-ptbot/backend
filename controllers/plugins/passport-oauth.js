@@ -3,7 +3,6 @@ const User = require("../../routers/routers");
 const Auth0Strategy = require("passport-auth0");
 const passport = require("passport");
 require("dotenv").config();
-// const authRoutes = require("./auth0");
 
 module.exports = function(botkit) {
   return {

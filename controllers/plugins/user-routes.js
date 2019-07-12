@@ -3,6 +3,7 @@ const NodeCron = require("../../config/node-con");
 const bodyParser = require("body-parser");
 const User = require("../../models/user-model");
 const Event = require("../../models/event-model");
+const Slack = require("../../models/slack-model");
 const db = require("../../routers/routers");
 
 module.exports = function(botkit) {
@@ -55,31 +56,52 @@ module.exports = function(botkit) {
 
       controller.webserver.get("/info/:id", async (req, res) => {
         const { id } = req.params;
-        console.log("|--- req.params---|\n", req.params);
+
         await User.findOne({
           _id: id
         })
           .populate("slack")
           .exec(async (err, info) => {
-            console.log("Slack Info:\n", info);
-            console.log("|---Access---|\n", info.slack[0].team_id);
-
             await Event.find({
               teamID: info.slack[0].team_id,
               slackID: info.slack[0].slackId
             })
               .populate("message")
               .exec((err, event) => {
-                console.log("|---Event Info---|\n", event);
                 res.send(event);
               });
           });
       });
 
       controller.webserver.post("/add/new", async (req, res) => {
+        const { end_date, start_date, msg } = req.body;
         try {
-          const vacation_added = await db.add_date(req.body);
-          return res.status(200).json({ vacation_added });
+          const savedEvent = await Slack.findOne({
+            _id: req.body.slackRef
+          })
+            .populate("slack")
+            .then(res => {
+              const { slackId, team_id } = res;
+              let newEvent = {
+                end_date,
+                start_date,
+                msg,
+                userID: slackId,
+                teamID: team_id
+              };
+
+              const vacation_added = db.add_date(newEvent);
+              return vacation_added;
+            });
+
+          return res.status(200).json({ savedEvent });
+
+          // console.log("slackid---->", getSlackID);
+          // const { slackId, team_id } = getSlackID;
+
+          // x = { ...req.body, slackId, team_id };
+          // const vacation_added = await db.add_date(x);
+          // return res.status(200).json({ vacation_added });
         } catch (err) {
           return res.status(500).json({ message: err });
         }
