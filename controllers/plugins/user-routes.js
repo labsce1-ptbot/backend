@@ -3,6 +3,7 @@ const NodeCron = require("../../config/node-con");
 const bodyParser = require("body-parser");
 const User = require("../../models/user-model");
 const Event = require("../../models/event-model");
+const Slack = require("../../models/slack-model");
 const db = require("../../routers/routers");
 
 module.exports = function(botkit) {
@@ -73,9 +74,34 @@ module.exports = function(botkit) {
       });
 
       controller.webserver.post("/add/new", async (req, res) => {
+        const { end_date, start_date, msg } = req.body;
         try {
-          const vacation_added = await db.add_date(req.body);
-          return res.status(200).json({ vacation_added });
+          const savedEvent = await Slack.findOne({
+            _id: req.body.slackRef
+          })
+            .populate("slack")
+            .then(res => {
+              const { slackId, team_id } = res;
+              let newEvent = {
+                end_date,
+                start_date,
+                msg,
+                userID: slackId,
+                teamID: team_id
+              };
+
+              const vacation_added = db.add_date(newEvent);
+              return vacation_added;
+            });
+
+          return res.status(200).json({ savedEvent });
+
+          // console.log("slackid---->", getSlackID);
+          // const { slackId, team_id } = getSlackID;
+
+          // x = { ...req.body, slackId, team_id };
+          // const vacation_added = await db.add_date(x);
+          // return res.status(200).json({ vacation_added });
         } catch (err) {
           return res.status(500).json({ message: err });
         }
