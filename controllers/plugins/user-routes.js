@@ -1,23 +1,23 @@
-const User = require('../../models/user-model');
-const Event = require('../../models/event-model');
-const Slack = require('../../models/slack-model');
-const db = require('../../routers/routers');
+const User = require("../../models/user-model");
+const Event = require("../../models/event-model");
+const Slack = require("../../models/slack-model");
+const db = require("../../routers/routers");
+const googleCal = require("../../routers/googleCal-routes");
 
-module.exports = (botkit) => {
+module.exports = botkit => {
   return {
     // The name of the plugin. Used to log messages at boot time.
-    name: 'user-routes.js',
-    init: (controller) => {
+    name: "user-routes.js",
+    init: controller => {
       async function userRoutes(req, res, next) {
-
-        controller.webserver.get('/user/profile', async (req, res) => {
+        controller.webserver.get("/user/profile", async (req, res) => {
           // console.log("he", res);
           let user;
           if (req.isAuthenticated()) {
             try {
               user = req.user;
               // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
-              console.log('<-=-=-=-=- Success! =-=-=-=->\n');
+              console.log("<-=-=-=-=- Success! =-=-=-=->\n");
               res.status(200).send({ success: true, userInfo: user });
             } catch (err) {
               res.status(500).send({ success: false });
@@ -27,61 +27,61 @@ module.exports = (botkit) => {
           // res.status(200).json({ success: true, userInfo: user });
         });
 
-        controller.webserver.get('/user/info', async (req, res) => {
-          console.log('|--- Slack-info Endpoint---|\n', req.user);
+        controller.webserver.get("/user/info", async (req, res) => {
+          console.log("|--- Slack-info Endpoint---|\n", req.user);
           await User.findOne({
-            email: req.user[0].email,
+            email: req.user[0].email
           })
-            .populate('slack')
+            .populate("slack")
             .exec(async (err, info) => {
-              console.log('Slack Info:\n', info);
-              console.log('|---Access---|\n', info.slack[0].team_id);
+              console.log("Slack Info:\n", info);
+              console.log("|---Access---|\n", info.slack[0].team_id);
 
               await Event.find({
                 teamID: info.slack[0].team_id,
-                slackID: info.slack[0].slackId,
+                slackID: info.slack[0].slackId
               })
-                .populate('message')
+                .populate("message")
                 .exec((err, event) => {
-                  console.log('|---Event Info---|\n', event);
+                  console.log("|---Event Info---|\n", event);
                   res.send(event);
                 });
             });
         });
 
-        controller.webserver.get('/user/info/:id', async (req, res) => {
+        controller.webserver.get("/user/info/:id", async (req, res) => {
           const { id } = req.params;
 
           await User.findOne({
-            _id: id,
+            _id: id
           })
-            .populate('slack')
+            .populate("slack")
             .exec(async (err, info) => {
               await Event.find({
                 teamID: info.slack[0].team_id,
-                slackID: info.slack[0].slackId,
+                slackID: info.slack[0].slackId
               })
-                .populate('message')
+                .populate("message")
                 .exec((err, event) => {
                   res.send(event);
                 });
             });
         });
 
-        controller.webserver.post('/user/add/new', async (req, res) => {
+        controller.webserver.post("/user/add/new", async (req, res) => {
           const { end_date, start_date, msg } = req.body;
+          const googleObj = { end_date, start_date, email };
           let user;
           if (req.isAuthenticated()) {
             user = req.session.passport.user;
-            console.log('|---User info in Post add Event|\n', user);
+            console.log("|---User info in Post add Event|\n", user);
           }
-          
-          try {
 
+          try {
             const savedEvent = await Slack.findOne({
-              _id: req.body.slackRef,
+              _id: req.body.slackRef
             })
-              .populate('slack')
+              .populate("slack")
               .then(res => {
                 const { slackId, team_id } = res;
                 let newEvent = {
@@ -89,12 +89,12 @@ module.exports = (botkit) => {
                   start_date,
                   msg,
                   userID: slackId,
-                  teamID: team_id,
+                  teamID: team_id
                 };
 
                 db.add_date(newEvent);
               });
-
+            googleCal.add_to_google(googleObj);
             res.status(200).json({ savedEvent });
 
             // console.log("slackid---->", getSlackID);
@@ -107,10 +107,10 @@ module.exports = (botkit) => {
             res.status(500).json({ message: err });
           }
         });
-        
+
         next();
       }
-      controller.webserver.use('/user', userRoutes);
+      controller.webserver.use("/user", userRoutes);
     }
-  }
-}
+  };
+};
