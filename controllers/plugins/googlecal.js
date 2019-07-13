@@ -13,10 +13,9 @@ module.exports = function(botkit) {
         const scope =
           "https://www.googleapis.com/auth/calendar.events&https://www.googleapis.com/auth/calendar";
         // Remember to add scopes for calendar later
-        let url = `https://accounts.google.com/o/oauth2/v2/auth?scope=${scope}&
-        access_type=offline&approval_prompt=force&response_type=code&redirect_uri=http://localhost:3000/googlecal/code&client_id=${
+        let url = `https://accounts.google.com/o/oauth2/v2/auth?scope=${scope}&prompt=consent&response_type=code&redirect_uri=http://localhost:3000/googlecal/code&client_id=${
           process.env.GOOGLE_CLIENT_ID
-        }&include_granted_scopes=true`;
+        }&include_granted_scopes=true&access_type=offline`;
         request.get(url, (err, httpResponse, body) => {
           res.send(body);
         });
