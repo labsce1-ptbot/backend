@@ -44,7 +44,6 @@ module.exports = (botkit) => {
           req.logout();
           res.redirect('/');
         });
-        console.log('REQ:', req.url)
         next();
         } 
 
