@@ -18,8 +18,7 @@ module.exports = {
     let options = {
       url: url,
       headers: {
-        Authorization:
-          "Bearer ya29.GlxFB0DKM-iGv3Qf8vjBKjmFP8tWSFUBMWdsiZtLaCcKGWssoGj9E68EEXjMi9uBAuTVxFhuhSXdI6odWNcQYhB8-AnsXhycpSMMP-YcK0tiJhqUfyQXBq1zLOncFw",
+        Authorization: `Bearer ${process.env.GOOGLE_AUTH_TOKEN}`,
         key: process.env.GOOGLE_API_KEY
       },
       json: true,
