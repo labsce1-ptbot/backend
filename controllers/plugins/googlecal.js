@@ -42,6 +42,10 @@ module.exports = function(botkit) {
           User.addToken(userId, accessToken);
 
           console.log("|---Body Response Redirect Google---|\n", data);
+          res.redirect(
+            "http://localhost:3001/admin/vacations" ||
+              `${process.env.ORIGIN}/admin/vacations`
+          );
         });
       });
     }
