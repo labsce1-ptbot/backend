@@ -48,6 +48,19 @@ module.exports = function(botkit) {
           );
         });
       });
+
+      controller.webserver.get("/googlecal/calendar", (req, res) => {
+      let user;
+      if(req.isAuthenticated()) {
+        user = req.user
+      }
+       console.log("|--- user info calendar ---|\n", user)
+        // let calendarId = req.user[0].email
+        // let url =  `https://www.googleapis.com/calendar/v3/calendars/${calendarId}`
+        // request.get(url, (err, httpResponse, body) => {
+        //   console.log(body)
+        // })
+      })
     }
   };
 };
