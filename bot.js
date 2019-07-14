@@ -86,13 +86,13 @@ controller.ready(() => {
   controller.loadModules(__dirname + "/controllers/features");
 
   // loading in custom plugins
+  controller.usePlugin(session);
   controller.usePlugin(server);
   controller.usePlugin(passportOAuth);
-  controller.usePlugin(session);
   controller.usePlugin(userRoutes);
   controller.usePlugin(authSlack);
   controller.usePlugin(googleCal);
-
+  
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
     controller.on("message,direct_message", async (bot, message) => {
