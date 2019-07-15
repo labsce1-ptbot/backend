@@ -112,7 +112,7 @@ module.exports = {
   findUser: async profile => {
     let foundUser = await User.find({ email: profile.email });
     console.log("--------FindUser--------\n", foundUser);
-    if (foundUser !== []) {
+    if (foundUser.length > 0) {
       return foundUser;
     } else {
       return "User doesn't exist";
@@ -139,7 +139,8 @@ module.exports = {
       first_name: profile.given_name,
       last_name: profile.family_name,
       email: profile.email,
-      picture: profile.picture
+      picture: profile.picture,
+      google_access_token: null,
     });
 
     console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
@@ -193,7 +194,14 @@ module.exports = {
     //   { $push: { event: dbResponse._id } }
     // );
 
-    console.log("|---Slackinfo saved---|", slack_to_User);
+    console.log("|---Slackinfo saved---|\n", slack_to_User);
     return slackAdd;
+  },
+  // Find user and then add google access token 
+  addToken: async(id, token) => {
+    const findUser = await User.findOne({_id: id})
+    console.log("|---User found before update for token---|\n", findUser)
+    await findUser.updateOne({google_access_token: token})
+    await findUser.save()
   }
 };

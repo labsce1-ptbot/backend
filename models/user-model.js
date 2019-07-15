@@ -28,6 +28,9 @@ const UserSchema = Schema({
   picture: {
     type: String
   },
+  google_access_token: {
+    type: String
+  },
   slack: [
     {
       type: mongoose.Schema.Types.ObjectId,

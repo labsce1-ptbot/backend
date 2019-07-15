@@ -1,11 +1,10 @@
-const passport = require('passport')
 const request = require('request')
 const Slack = require('../../routers/routers')
 
 module.exports = (botkit) => {
   return {
     // Plugin Name
-    name: 'slack-auth',
+    name: 'slack-auth.js',
     // Initialize module
     init: (controller) => {
       function slackAuthRoutes(req, res, next) {
@@ -45,7 +44,6 @@ module.exports = (botkit) => {
           req.logout();
           res.redirect('/');
         });
-        console.log('REQ:', req.url)
         next();
         } 
 
