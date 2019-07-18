@@ -7,27 +7,26 @@ const googleCal = require("../../routers/googleCal-routes");
 module.exports = botkit => {
   return {
     // The name of the plugin. Used to log messages at boot time.
-    name: 'user-routes.js',
-    init: (controller) => {
+    name: "user-routes.js",
+    init: controller => {
       function userRoutes(req, res, next) {
-
-      controller.webserver.get('/user/profile', async (req, res) => {
-        // console.log("he", res);
-        let user;
-        if(req.isAuthenticated()) {
-        try {
-            user = req.user
-            console.log("|--User info---|", user)
-            // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
-            console.log('<-=-=-=-=- Success! =-=-=-=->\n');
-            res.send({ success: true, userInfo: user });
-          } catch (err) {
-            res.send({ success: false });
+        controller.webserver.get("/user/profile", async (req, res) => {
+          // console.log("he", res);
+          let user;
+          if (req.isAuthenticated()) {
+            try {
+              user = req.user;
+              console.log("|--User info---|", user);
+              // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
+              console.log("<-=-=-=-=- Success! =-=-=-=->\n");
+              res.send({ success: true, userInfo: user });
+            } catch (err) {
+              res.send({ success: false });
+            }
           }
-        }
-        res.send({ success: false });
-        // res.status(200).json({ success: true, userInfo: user });
-      });
+          res.send({ success: false });
+          // res.status(200).json({ success: true, userInfo: user });
+        });
 
         controller.webserver.get("/user/info", async (req, res) => {
           console.log("|--- Slack-info Endpoint---|\n", req.user);
@@ -99,17 +98,27 @@ module.exports = botkit => {
             googleCal.add_to_google(googleObj);
             res.status(200).json({ savedEvent });
 
-          // x = { ...req.body, slackId, team_id };
-          // const vacation_added = await db.add_date(x);
-          // return res.status(200).json({ vacation_added });
-        } catch (err) {
-          res.status(500).json({ message: err });
-        }
-        })
+            // x = { ...req.body, slackId, team_id };
+            // const vacation_added = await db.add_date(x);
+            // return res.status(200).json({ vacation_added });
+          } catch (err) {
+            res.status(500).json({ message: err });
+          }
+        });
+
+        controller.webserver.delete("/user/delete/:id", async (req, res) => {
+          try {
+            const { id } = req.params;
+            const count = await db.deleteVacation(id);
+            res.status(200).json({ count });
+          } catch (err) {
+            res.status(501).json({ message: err });
+          }
+        });
 
         next();
       }
       controller.webserver.use("/user", userRoutes);
-      }
-    };
-  }
+    }
+  };
+};
