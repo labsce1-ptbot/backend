@@ -98,6 +98,7 @@ module.exports = {
 
   //deletes a vacation
   deleteVacation: async id => {
+    const event = await Event.find({ _id: `${id}` });
     const count = await Event.deleteOne({ _id: `${id}` });
 
     //deletes the ref in users
@@ -105,6 +106,11 @@ module.exports = {
     //   { email: "message.email" },
     //   { $pull: { event: id } }
     // );
+
+    if (event[0].message.length > 0) {
+      const x = await Messages.deleteOne({ _id: event[0].message[0] });
+    }
+
     return count.n;
   },
 
@@ -140,7 +146,7 @@ module.exports = {
       last_name: profile.family_name,
       email: profile.email,
       picture: profile.picture,
-      google_access_token: null,
+      google_access_token: null
     });
 
     console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
@@ -197,11 +203,11 @@ module.exports = {
     console.log("|---Slackinfo saved---|\n", slack_to_User);
     return slackAdd;
   },
-  // Find user and then add google access token 
-  addToken: async(id, token) => {
-    const findUser = await User.findOne({_id: id})
-    console.log("|---User found before update for token---|\n", findUser)
-    await findUser.updateOne({google_access_token: token})
-    await findUser.save()
+  // Find user and then add google access token
+  addToken: async (id, token) => {
+    const findUser = await User.findOne({ _id: id });
+    console.log("|---User found before update for token---|\n", findUser);
+    await findUser.updateOne({ google_access_token: token });
+    await findUser.save();
   }
 };
