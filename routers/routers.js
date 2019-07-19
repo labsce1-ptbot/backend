@@ -146,7 +146,8 @@ module.exports = {
       last_name: profile.family_name,
       email: profile.email,
       picture: profile.picture,
-      google_access_token: null
+      google_access_token: null,
+      google_refresh_token: null
     });
 
     console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
@@ -204,10 +205,14 @@ module.exports = {
     return slackAdd;
   },
   // Find user and then add google access token
-  addToken: async (id, token) => {
+  addToken: async (id, token, refresh) => {
     const findUser = await User.findOne({ _id: id });
     console.log("|---User found before update for token---|\n", findUser);
-    await findUser.updateOne({ google_access_token: token });
+
+    await findUser.updateOne({
+      google_access_token: token,
+      google_refresh_token: refresh
+    });
     await findUser.save();
   }
 };

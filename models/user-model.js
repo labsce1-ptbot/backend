@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -29,6 +28,9 @@ const UserSchema = Schema({
     type: String
   },
   google_access_token: {
+    type: String
+  },
+  google_refresh_token: {
     type: String
   },
   slack: [

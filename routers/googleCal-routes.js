@@ -1,24 +1,35 @@
 const axios = require("axios");
 const request = require("request");
+const User = require("../models/user-model");
+const moment = require("moment");
+
 require("dotenv").config();
+
 module.exports = {
   add_to_google: async event => {
-    const url = `https://www.googleapis.com/calendar/v3/calendars/vacaybot1@gmail.com/events`;
-    const { email, start_date, end_date } = event;
+    const { email, start_date, end_date, id } = event;
+
+    const user = await User.findOne({
+      _id: id
+    });
+
+    console.log("-----Googel cal route user", user);
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${email}/events`;
 
     let data = {
       end: {
-        date: "2019-11-10"
+        date: moment(end_date).format("YYYY-MM-DD")
       },
       start: {
-        date: "2019-10-10"
-      }
+        date: moment(start_date).format("YYYY-MM-DD")
+      },
+      summary: "Vacation"
     };
 
     let options = {
       url: url,
       headers: {
-        Authorization: `Bearer ${process.env.GOOGLE_AUTH_TOKEN}`,
+        Authorization: `Bearer ${user.google_access_token}`,
         key: process.env.GOOGLE_API_KEY
       },
       json: true,

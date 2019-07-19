@@ -71,7 +71,8 @@ module.exports = botkit => {
 
         controller.webserver.post("/user/add/new", async (req, res) => {
           const { end_date, start_date, msg, email, id } = req.body;
-          const googleObj = { end_date, start_date, email };
+          const googleObj = { end_date, start_date, email, id };
+          console.log("---body---", req.body);
           let user;
           if (req.isAuthenticated()) {
             user = req.session.passport.user;
