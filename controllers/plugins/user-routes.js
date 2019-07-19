@@ -70,7 +70,7 @@ module.exports = botkit => {
         });
 
         controller.webserver.post("/user/add/new", async (req, res) => {
-          const { end_date, start_date, msg, email, slackRef, id } = req.body;
+          const { end_date, start_date, msg, email, id } = req.body;
           const googleObj = { end_date, start_date, email };
           let user;
           if (req.isAuthenticated()) {
