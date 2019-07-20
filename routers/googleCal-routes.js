@@ -36,7 +36,6 @@ module.exports = {
       json: true,
       body: data
     };
-    console.log("function", route.add_date);
 
     request.post(options, (err, httpResonse, body) => {
       console.log("body--gCal------------\n>", body);
