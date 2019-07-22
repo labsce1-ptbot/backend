@@ -70,8 +70,9 @@ module.exports = botkit => {
         });
 
         controller.webserver.post("/user/add/new", async (req, res) => {
-          const { end_date, start_date, msg, email, slackRef } = req.body;
-          const googleObj = { end_date, start_date, email };
+          const { end_date, start_date, msg, email, id } = req.body;
+          const googleObj = { end_date, start_date, email, id };
+          console.log("---body---", req.body);
           let user;
           if (req.isAuthenticated()) {
             user = req.session.passport.user;
@@ -79,12 +80,12 @@ module.exports = botkit => {
           }
 
           try {
-            const savedEvent = await Slack.findOne({
-              _id: slackRef
+            const savedEvent = await User.findOne({
+              _id: id
             })
               .populate("slack")
               .then(res => {
-                const { slackId, team_id } = res;
+                const { slackId, team_id } = res.slack[0];
                 let newEvent = {
                   end_date,
                   start_date,

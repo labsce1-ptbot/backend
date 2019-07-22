@@ -39,7 +39,8 @@ module.exports = function(botkit) {
         request.post(url, (err, httpResponse, body) => {
           let data = JSON.parse(body);
           let accessToken = data.access_token;
-          User.addToken(userId, accessToken);
+          let refresh = data.refresh_token ? data.refresh_token : null;
+          User.addToken(userId, accessToken, refresh);
 
           console.log("|---Body Response Redirect Google---|\n", data);
           res.redirect(
@@ -50,17 +51,17 @@ module.exports = function(botkit) {
       });
 
       controller.webserver.get("/googlecal/calendar", (req, res) => {
-      let user;
-      if(req.isAuthenticated()) {
-        user = req.user
-      }
-       console.log("|--- user info calendar ---|\n", user)
+        let user;
+        if (req.isAuthenticated()) {
+          user = req.user;
+        }
+        console.log("|--- user info calendar ---|\n", user);
         // let calendarId = req.user[0].email
         // let url =  `https://www.googleapis.com/calendar/v3/calendars/${calendarId}`
         // request.get(url, (err, httpResponse, body) => {
         //   console.log(body)
         // })
-      })
+      });
     }
   };
 };

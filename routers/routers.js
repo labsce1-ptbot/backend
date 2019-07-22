@@ -4,6 +4,9 @@ const Slack = require("../models/slack-model");
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
 const moment = require("moment");
+const request = require("request");
+require("dotenv").config();
+const google = require("./googleCal-routes");
 
 module.exports = {
   // Slack
@@ -146,7 +149,8 @@ module.exports = {
       last_name: profile.family_name,
       email: profile.email,
       picture: profile.picture,
-      google_access_token: null
+      google_access_token: null,
+      google_refresh_token: null
     });
 
     console.log("<---=-=-=-=- NEWUSER =-=-=--->\n", newUser);
@@ -204,10 +208,34 @@ module.exports = {
     return slackAdd;
   },
   // Find user and then add google access token
-  addToken: async (id, token) => {
+  addToken: async (id, token, refresh) => {
     const findUser = await User.findOne({ _id: id });
     console.log("|---User found before update for token---|\n", findUser);
-    await findUser.updateOne({ google_access_token: token });
+
+    await findUser.updateOne({
+      google_access_token: token,
+      google_refresh_token: refresh
+    });
     await findUser.save();
   }
+
+  // refreshAccessToken: async (event, user) => {
+  //   let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${
+  //     user.google_refresh_token
+  //   }&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${
+  //     process.env.GOOGLE_CLIENT_SECRET
+  //   }&grant_type=refresh_token`;
+  //   await request.post(url, async (err, httpResponse, body) => {
+  //     let data = JSON.parse(body);
+
+  //     const userToken = await User.updateOne(
+  //       { _id: user._id },
+  //       { google_access_token: data.access_token }
+  //     );
+
+  //     if (userToken.n === 1) {
+  //       google.add_to_google(event);
+  //     }
+  //   });
+  // }
 };
