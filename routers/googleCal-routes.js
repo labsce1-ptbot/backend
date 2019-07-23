@@ -2,6 +2,7 @@ const axios = require("axios");
 const request = require("request");
 const User = require("../models/user-model");
 const moment = require("moment");
+const Slack = require("../models/slack-model");
 
 require("dotenv").config();
 
@@ -47,6 +48,30 @@ module.exports = googleRoutes = {
         // console.log("err--gCal--------------------\n>", err);
         // console.log("http--gCal--------------\n>", httpResonse);
       });
+    }
+  },
+
+  slackVacationHelper: async event => {
+    const slack_id = await Slack.findOne({
+      slackId: event.userID,
+      team_id: event.teamID
+    });
+
+    const user = await User.findOne({
+      slack: {
+        _id: slack_id._id
+      }
+    });
+
+    googleObj = {
+      email: user.email,
+      start_date: event.start_date,
+      end_date: event.end_date,
+      id: user._id
+    };
+
+    if (user.google_access_token !== null) {
+      googleRoutes.add_to_google(googleObj);
     }
   }
 };

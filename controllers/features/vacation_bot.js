@@ -8,6 +8,7 @@ let db = require("../../routers/routers");
 let moment = require("moment");
 let block_helper = require("../../routers/interactive_blocks");
 const { SlackDialog } = require("botbuilder-adapter-slack");
+const googleCalHelper = require("../../routers/googleCal-routes");
 
 module.exports = function(controller) {
   // Temporarily holding user's input for start/end date
@@ -374,7 +375,9 @@ module.exports = function(controller) {
       });
     } else {
       const dbResponse = await db.add_date(newDate[blockId]);
-
+      const googleResponse = await googleCalHelper.slackVacationHelper(
+        newDate[blockId]
+      );
       if ((dbResponse.slackID = message.user)) {
         await bot.replyPrivate(message, "Your Vacation has been scheduled!");
         delete newDate[blockId];
