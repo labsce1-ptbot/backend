@@ -72,6 +72,8 @@ module.exports = googleRoutes = {
 
     if (user.google_access_token !== null) {
       googleRoutes.add_to_google(googleObj);
+    } else {
+      return;
     }
   }
 };
