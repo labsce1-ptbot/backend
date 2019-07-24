@@ -2,10 +2,11 @@ const axios = require("axios");
 const request = require("request");
 const User = require("../models/user-model");
 const moment = require("moment");
+const Slack = require("../models/slack-model");
 
 require("dotenv").config();
 
-module.exports = {
+module.exports = googleRoutes = {
   add_to_google: async event => {
     const { email, start_date, end_date, id } = event;
 
@@ -37,15 +38,43 @@ module.exports = {
       body: data
     };
 
-    request.post(options, (err, httpResonse, body) => {
-      console.log("body--gCal------------\n>", body);
-      if (body.error) {
-        refreshAccess(event, user);
-      }
+    if (user.google_access_token !== null) {
+      request.post(options, (err, httpResonse, body) => {
+        console.log("body--gCal------------\n>", body);
+        if (body.error) {
+          refreshAccess(event, user);
+        }
 
-      // console.log("err--gCal--------------------\n>", err);
-      // console.log("http--gCal--------------\n>", httpResonse);
+        // console.log("err--gCal--------------------\n>", err);
+        // console.log("http--gCal--------------\n>", httpResonse);
+      });
+    }
+  },
+
+  slackVacationHelper: async event => {
+    const slack_id = await Slack.findOne({
+      slackId: event.userID,
+      team_id: event.teamID
     });
+
+    const user = await User.findOne({
+      slack: {
+        _id: slack_id._id
+      }
+    });
+
+    googleObj = {
+      email: user.email,
+      start_date: event.start_date,
+      end_date: event.end_date,
+      id: user._id
+    };
+
+    if (user.google_access_token !== null) {
+      googleRoutes.add_to_google(googleObj);
+    } else {
+      return;
+    }
   }
 };
 
@@ -58,12 +87,14 @@ const refreshAccess = async (event, user) => {
   await request.post(url, async (err, httpResponse, body) => {
     let data = JSON.parse(body);
 
-    await User.updateOne(
+    const updatedUser = await User.updateOne(
       { _id: user._id },
       { google_access_token: data.access_token }
     );
-    // if (updatedUser)
-    //       googleRoutes.add_to_google(event);
+    console.log("----->------", updatedUser);
+    if (updatedUser.n === 1) {
+      googleRoutes.add_to_google(event);
+    }
   });
 };
 // POST https://www.googleapis.com/calendar/v3/calendars/[CALENDARID]/events?key=[YOUR_API_KEY] HTTP/1.1
