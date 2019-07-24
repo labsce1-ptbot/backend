@@ -165,11 +165,22 @@ module.exports = {
 
   //runs every Sunday to clear out expired vacations
   clean_old_vacations: async () => {
-    const u = await Event.find({ endDate: { $lt: Date.now() } });
+    const old_events = await Event.find({ endDate: { $lt: Date.now() } });
 
-    const l = u.map(id => id._id);
-    console.log("====u======", l);
-    const z = Event.deleteMany({ endDate: { $lt: Date.now() } });
+    old_events_ids = [];
+    old_messages_ids = [];
+
+    if (old_events.length !== 0) {
+      old_events.forEach(id => {
+        old_events_ids.push(id._id);
+        if (id.message.length > 0) {
+          old_messages_ids.push(id.message[0]);
+        }
+      });
+
+      await Event.deleteMany({ _id: { $in: old_events_ids } });
+      await Messages.deleteMany({ _id: { $in: old_messages_ids } });
+    }
   },
 
   // User slack info added to Slack document

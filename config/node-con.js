@@ -30,30 +30,39 @@ module.exports = function() {
 
   // Testing, but it runs every one minute
   // const testing = cron.schedule("* * * * * *", async () => {
-  //                     console.log("-------------------------\n");
-  //                     console.log("Collecting data from database and saving to cache.js\n");
-  //                     const find = await db.get_date();
-  //                     find.forEach(obj => {
-  //                         cache[obj.slackID] = {
-  //                             "start_date" : obj.startDate,
-  //                             "end_date" : obj.endDate,
-  //                             "message" : obj.message,
-  //                             "vacation" : true
-  //                         }, {
-  //                             scheduled: false,
-  //                             timezone: eastern
-  //                         }
-  //                     })
-  //                     console.log("------------------------\n");
-  //                     console.log("End results of what's in cache.js:", cache);
-  //                 })
+  //   console.log("-------------------------\n");
+  //   console.log("Collecting data from database and saving to cache.js\n");
+  //   const find = await db.get_date();
+  //   find.forEach(obj => {
+  //     (cache[obj.slackID] = {
+  //       start_date: obj.startDate,
+  //       end_date: obj.endDate,
+  //       message: obj.message,
+  //       vacation: true
+  //     }),
+  //       {
+  //         scheduled: false,
+  //         timezone: eastern
+  //       };
+  //   });
+  //   console.log("------------------------\n");
+  //   console.log("End results of what's in cache.js:", cache);
+  // });
 
   // testing.start();
 
   //removes expired vacations every sunday
-  //   cron.schedule("01 00 * * *", async () => {
+  // const deleteL = cron.schedule(
+  //   "*/35 * * * * *",
+  //   async () => {
+  //     console.log("run");
   //     const delete_old = await db.clean_old_vacations();
-  //   });
+  //   },
+  //   {
+  //     scheduled: true
+  //   }
+  // );
+  // deleteL.start();
 };
 
 /*
@@ -68,3 +77,14 @@ module.exports = function() {
      second ( optional )
 
 */
+
+cron.schedule(
+  "00 00 00 * * *",
+  async () => {
+    const delete_old = await db.clean_old_vacations();
+  },
+  {
+    scheduled: true,
+    timezone: "America/New_York"
+  }
+);
