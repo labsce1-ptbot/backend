@@ -29,7 +29,8 @@
     "node-cron": "^2.0.3",
     "passport": "^0.4.0",
     "passport-auth0": "^1.1.0",
-    "passport-slack": "0.0.7"
+    "passport-slack": "0.0.7",
+    "passport-slack-oauth2": "^1.0.2"
   },
   "devDependencies": {
     "nodemon": "^1.19.1",
