@@ -62,6 +62,7 @@ module.exports = botkit => {
                 teamID: info.slack[0].team_id,
                 slackID: info.slack[0].slackId
               })
+                .sort({ startDate: 1 })
                 .populate("message")
                 .exec((err, event) => {
                   res.send(event);
