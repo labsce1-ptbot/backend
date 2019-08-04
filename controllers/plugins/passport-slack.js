@@ -12,8 +12,7 @@ module.exports = botkit => {
             {
               clientID: process.env.clientId,
               clientSecret: process.env.clientSecret,
-              scope: ["identity.basic", "identity.email", "identity.avatar"],
-              skipUserProfile: false
+              scope: ["identity.basic", "identity.email", "identity.avatar"]
             },
             async (accessToken, refreshToken, profile, done) => {
               let user;
@@ -27,6 +26,9 @@ module.exports = botkit => {
             }
           )
         );
+
+        passport.serializeUser((profile, done) => done(null, profile));
+        passport.deserializeUser((profile, done) => done(null, profile));
 
         controller.webserver.get(
           "/test/slack",
@@ -51,9 +53,13 @@ module.exports = botkit => {
           res.send("Failed Login");
         });
 
-        controller.webserver.get("/test/success", (req, res) => {
-          res.send("Success? Sure why not!");
-        });
+        controller.webserver.get(
+          "/test/success",
+          passport.authenticate("Slack"),
+          (req, res) => {
+            res.send("Success? Sure why not!");
+          }
+        );
         next();
       }
       controller.webserver.use("/test", testRoutes);
