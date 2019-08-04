@@ -16,7 +16,6 @@ module.exports = botkit => {
             },
             async (accessToken, refreshToken, profile, done) => {
               let user;
-              console.log("----access", accessToken);
               console.log("--- Test Profile Slack Passport ---\n", profile);
               try {
                 user = await db.testSlackAddUser(profile);
