@@ -16,6 +16,7 @@ module.exports = botkit => {
             },
             async (accessToken, refreshToken, profile, done) => {
               let user;
+              console.log("----access", accessToken);
               console.log("--- Test Profile Slack Passport ---\n", profile);
               try {
                 user = await db.testSlackAddUser(profile);
@@ -57,7 +58,7 @@ module.exports = botkit => {
           "/test/success",
           passport.authenticate("Slack"),
           (req, res) => {
-            res.send("Success? Sure why not!");
+            res.redirect(`${process.env.SLACK_REDIRECT}/admin/dashboard`);
           }
         );
         next();
