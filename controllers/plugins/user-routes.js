@@ -11,9 +11,10 @@ module.exports = botkit => {
     init: controller => {
       function userRoutes(req, res, next) {
         controller.webserver.get("/user/profile", async (req, res) => {
-          // console.log("he", res);
+          // console.log("he", req);
           let user;
           if (req.isAuthenticated()) {
+            console.log("he", req.user);
             try {
               user = req.user;
               console.log("|--User info---|", user);
@@ -62,6 +63,7 @@ module.exports = botkit => {
                 teamID: info.slack[0].team_id,
                 slackID: info.slack[0].slackId
               })
+                .sort({ startDate: 1 })
                 .populate("message")
                 .exec((err, event) => {
                   res.send(event);

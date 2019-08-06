@@ -12,10 +12,11 @@ require("dotenv").config();
 // Importing custom plugins
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
-let authSlack = require("./controllers/plugins/slack-auth");
+// let authSlack = require("./controllers/plugins/slack-auth");
 let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/user-routes");
 let googleCal = require("./controllers/plugins/googlecal")
+let testSlack = require("./controllers/plugins/passport-slack")
 
 // Import a platform-specific adapter for slack.
 
@@ -90,8 +91,9 @@ controller.ready(() => {
   controller.usePlugin(server);
   controller.usePlugin(passportOAuth);
   controller.usePlugin(userRoutes);
-  controller.usePlugin(authSlack);
+  // controller.usePlugin(authSlack);
   controller.usePlugin(googleCal);
+  controller.usePlugin(testSlack);
   
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {
