@@ -57,7 +57,7 @@ module.exports = botkit => {
           "/test/success",
           passport.authenticate("Slack"),
           (req, res) => {
-            res.redirect(`${process.env.SLACK_REDIRECT}/admin/dashboard`);
+            res.redirect(`${process.env.SLACK_REDIRECT}/admin/user`);
           }
         );
         next();
