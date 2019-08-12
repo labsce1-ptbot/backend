@@ -7,21 +7,18 @@ let db = require("../../routers/routers");
 let moment = require("moment");
 
 module.exports = function(controller) {
-  controller.hears("sample", "message", async (bot, message) => {
-    await bot.reply(message, "I heard a sample message.");
-  });
-
+  // controller.hears("sample", "message", async (bot, message) => {
+  //   await bot.reply(message, "I heard a sample message.");
+  // });
   // const user = {
   //   "<@UK7L9AYFR>": true
   // };
   // const users = "<@UK7L9AYFR>";
-
   //Hard coded, but doesn't work as well
   // controller.hears(`${user}`, 'message,direct_message', async(bot, message) => {
   //     console.log(message)
   //     await bot.reply(message, `${user} is on vacation`);
   // });
-
   //Listen for users and make comparison on user object
   // controller.on("message", async (bot, message) => {
   //   const compare = message.incoming_message.channelData.text;
@@ -34,45 +31,41 @@ module.exports = function(controller) {
   //     );
   //   }
   // });
-
   // Sample_echo
   // controller.on('message', async(bot, message) => {
   //     await bot.reply(message, `Echo: ${ message.text }`);
   // });
-
-  controller.hears("yes", "message", async (bot, message) => {
-    const dbResponse = await add_date(message);
-    console.log("--------dbres-------", dbResponse);
-    if (dbResponse[dbResponse.length - 1] === "conflict") {
-      dbResponse.pop();
-      let conflicts = dbResponse.map(dbRespond => ({
-        response_type: "ephemeral",
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `${dbRespond.startDate} - ${
-            dbRespond.endDate
-          }\nThese vacations are in conflict with each other`
-        },
-        accessory: {
-          type: "button",
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "Choose"
-          },
-          value: dbRespond._id
-        }
-      }));
-
-      await bot.reply(message, {
-        blocks: conflicts
-      });
-    } else {
-      await bot.reply(message, "vacation time scheduled!");
-    }
-  });
-
+  // controller.hears("yes", "message", async (bot, message) => {
+  //   const dbResponse = await add_date(message);
+  //   console.log("--------dbres-------", dbResponse);
+  //   if (dbResponse[dbResponse.length - 1] === "conflict") {
+  //     dbResponse.pop();
+  //     let conflicts = dbResponse.map(dbRespond => ({
+  //       response_type: "ephemeral",
+  //       type: "section",
+  //       text: {
+  //         type: "mrkdwn",
+  //         text: `${dbRespond.startDate} - ${
+  //           dbRespond.endDate
+  //         }\nThese vacations are in conflict with each other`
+  //       },
+  //       accessory: {
+  //         type: "button",
+  //         text: {
+  //           type: "plain_text",
+  //           emoji: true,
+  //           text: "Choose"
+  //         },
+  //         value: dbRespond._id
+  //       }
+  //     }));
+  //     await bot.reply(message, {
+  //       blocks: conflicts
+  //     });
+  //   } else {
+  //     await bot.reply(message, "vacation time scheduled!");
+  //   }
+  // });
   // controller.on("block_actions", async (bot, message) => {
   //   console.log(
   //     "=============adafa==============",
@@ -80,7 +73,6 @@ module.exports = function(controller) {
   //   );
   //   if (message.actions[0].text.text === "Delete") {
   //     const dbResponse = await db.deleteVacation(message.actions[0].value);
-
   //     if (dbResponse > 0) {
   //       return await bot.replyPrivate(message, "Booo, Vacation deleted");
   //     } else {
@@ -91,7 +83,6 @@ module.exports = function(controller) {
   //     }
   //   }
   // });
-
   // controller.on("slash_command", async (bot, message) => {
   //   if (message.text === "all") {
   //     const allMsgs = await db.showAll(message);
@@ -132,7 +123,6 @@ module.exports = function(controller) {
   //     }
   //   ]
   // }
-
   //         type: "section",
   //         text: {
   //           type: "mrkdwn",
@@ -152,7 +142,6 @@ module.exports = function(controller) {
   //           action_id: "button"
   //         }
   //       }));
-
   //       await bot.replyPrivate(message, { blocks: displayMsgs });
   //     } else {
   //       await bot.replyPrivate(
@@ -162,7 +151,6 @@ module.exports = function(controller) {
   //     }
   //   }
   // });
-
   // controller.on("slash_command", async (bot, message) => {
   //   if (message.text === "all") {
   //     const allMsgs = await db.showAll(message);
@@ -187,7 +175,6 @@ module.exports = function(controller) {
   //           action_id: "button"
   //         }
   //       }));
-
   //       await bot.replyPrivate(message, { blocks: displayMsgs });
   //     } else {
   //       await bot.replyPrivate(
@@ -197,11 +184,9 @@ module.exports = function(controller) {
   //     }
   //   }
   // });
-
   // controller.on("block_actions", async (bot, message) => {
   //   if (message.actions[0].text.text === "Delete") {
   //     const dbResponse = await db.deleteVacation(message.actions[0].value);
-
   //     if (dbResponse > 0) {
   //       return await bot.replyPrivate(message, "Booo, Vacation deleted");
   //     } else {
@@ -212,11 +197,9 @@ module.exports = function(controller) {
   //     }
   //   }
   // });
-
   // controller.on("message", async (bot, message) => {
   //   // console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
   //   const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
-
   //   if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
   //     await bot.replyInThread(
   //       message,
@@ -230,7 +213,6 @@ module.exports = function(controller) {
   //     );
   //   }
   // });
-
   // controller.on("slash_command", async (bot, message) => {
   //   if (message.text === "plain") {
   //     await bot.reply(message, "This is a plain reply");
@@ -239,7 +221,6 @@ module.exports = function(controller) {
   //   } else if (message.text === "private") {
   //     await bot.replyPrivate(message, "This is a private reply");
   //   }
-
   //   if (message.text === "testing") {
   //     await bot.replyPrivate(message, {
   //       blocks: [

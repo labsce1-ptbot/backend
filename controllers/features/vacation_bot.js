@@ -388,4 +388,11 @@ module.exports = function(controller) {
     }
     await bot.cancelAllDialogs();
   });
+
+  controller.on("slash_command", async (bot, message) => {
+    console.log("----mesage help---->", message);
+    if (message.text === "help") {
+      await bot.replyPrivate(message, { blocks: block_helper.help() });
+    }
+  });
 };
