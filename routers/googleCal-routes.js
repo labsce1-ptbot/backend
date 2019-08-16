@@ -57,23 +57,26 @@ module.exports = googleRoutes = {
       team_id: event.teamID
     });
 
-    const user = await User.findOne({
-      slack: {
-        _id: slack_id._id
+    if (slack_id) {
+      const user = await User.findOne({
+        slack: {
+          _id: slack_id._id
+        }
+      });
+    }
+    console.log("user---->", user);
+    if (user) {
+      googleObj = {
+        email: user.email,
+        start_date: event.start_date,
+        end_date: event.end_date,
+        id: user._id
+      };
+      if (user.google_access_token !== null) {
+        googleRoutes.add_to_google(googleObj);
+      } else {
+        return;
       }
-    });
-
-    googleObj = {
-      email: user.email,
-      start_date: event.start_date,
-      end_date: event.end_date,
-      id: user._id
-    };
-
-    if (user.google_access_token !== null) {
-      googleRoutes.add_to_google(googleObj);
-    } else {
-      return;
     }
   }
 };

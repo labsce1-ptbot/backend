@@ -17,7 +17,7 @@ module.exports = {
     //   moment.tz(message.start_date, "America/New_York").format()
     // );
     let date_string;
-    if (message.start_date.slice(-1) === "Z") {
+    if (message.start_date && message.start_date.slice(-1) === "Z") {
       date_string = message.start_date;
     } else {
       date_string = `${message.start_date}T03:01:00.000Z`;

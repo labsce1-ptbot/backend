@@ -296,7 +296,7 @@ module.exports = function(controller) {
 
   //dialog prompt for user to leave an away message
   controller.on("block_actions", async (bot, message) => {
-    console.log("========message===============", message);
+    console.log("========blocks===============", message);
 
     if (message.actions[0].value === "Custom Message") {
       let dialog = new SlackDialog(
@@ -333,8 +333,8 @@ module.exports = function(controller) {
           }
         ]
       ).notifyOnCancel(false);
-      console.log("====dialog===", blockId);
-      console.log("====dialog===", newDate);
+      // console.log("====dialog===", blockId);
+      // console.log("====dialog===", newDate);
       await bot.replyWithDialog(message, dialog.asObject());
     }
   });
@@ -353,38 +353,41 @@ module.exports = function(controller) {
     console.log("====dialog===", blockId);
 
     console.log("====dialog===", newDate);
+    try {
+      if (
+        newDate[blockId].start_date === "" ||
+        newDate[blockId].end_date === ""
+      ) {
+        const error_msg =
+          ":warning: Please select a start and end date :warning:";
+        await bot.replyPrivate(message, {
+          blocks: block_helper.schedule_vacay(error_msg)
+        });
+      } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
+        const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
+          newDate[blockId].start_date
+        ).format("MMMM DD, YYYY")}, end: ${moment(
+          newDate[blockId].end_date
+        ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
 
-    if (
-      newDate[blockId].start_date === "" ||
-      newDate[blockId].end_date === ""
-    ) {
-      const error_msg =
-        ":warning: Please select a start and end date :warning:";
-      await bot.replyPrivate(message, {
-        blocks: block_helper.schedule_vacay(error_msg)
-      });
-    } else if (newDate[blockId].start_date > newDate[blockId].end_date) {
-      const date_error_msg = `:warning: Your vacation ends before it begins\n (start: ${moment(
-        newDate[blockId].start_date
-      ).format("MMMM DD, YYYY")}, end: ${moment(
-        newDate[blockId].end_date
-      ).format("MMMM DD, YYYY")})\nPlease try again. :warning:`;
-
-      await bot.replyPrivate(message, {
-        blocks: block_helper.schedule_vacay(date_error_msg)
-      });
-    } else {
-      const dbResponse = await db.add_date(newDate[blockId]);
-      const googleResponse = await googleCalHelper.slackVacationHelper(
-        newDate[blockId]
-      );
-      if ((dbResponse.slackID = message.user)) {
-        await bot.replyPrivate(message, "Your Vacation has been scheduled!");
-        delete newDate[blockId];
-        console.log(newDate[blockId]);
+        await bot.replyPrivate(message, {
+          blocks: block_helper.schedule_vacay(date_error_msg)
+        });
       } else {
-        await bot.replyPrivate(message, "Vacation denied!");
+        const dbResponse = await db.add_date(newDate[blockId]);
+        const googleResponse = await googleCalHelper.slackVacationHelper(
+          newDate[blockId]
+        );
+        if ((dbResponse.slackID = message.user)) {
+          await bot.replyPrivate(message, "Your Vacation has been scheduled!");
+          delete newDate[blockId];
+          console.log(newDate[blockId]);
+        } else {
+          await bot.replyPrivate(message, "Vacation denied!");
+        }
       }
+    } catch (error) {
+      console.log("error------> \n", error);
     }
     await bot.cancelAllDialogs();
   });
