@@ -56,15 +56,15 @@ module.exports = googleRoutes = {
       slackId: event.userID,
       team_id: event.teamID
     });
-
+    let user;
     if (slack_id) {
-      const user = await User.findOne({
+      user = await User.findOne({
         slack: {
           _id: slack_id._id
         }
       });
     }
-    console.log("user---->", user);
+
     if (user) {
       googleObj = {
         email: user.email,
