@@ -4,6 +4,8 @@
 // |__) \__/  |  |  \ |  |
 
 // This is the main file for the PTbOt bot.
+// Spins up and runs plugins
+// Add dependencies
 
 // Import Botkit's core features
 const { Botkit } = require("botkit");
@@ -59,7 +61,7 @@ const adapter = new SlackAdapter({
   getTokenForTeam: getTokenForTeam,
   getBotUserByTeam: getBotUserByTeam
 });
-
+// Run controller
 // Use SlackEventMiddleware to emit events that match their original Slack event types.
 adapter.use(new SlackEventMiddleware());
 
@@ -86,7 +88,7 @@ if (process.env.cms_uri) {
 controller.ready(() => {
   // load traditional developer-created local custom feature modules
   controller.loadModules(__dirname + "/controllers/features");
-
+  // Middleware
   // loading in custom plugins
   controller.usePlugin(session);
   controller.usePlugin(server);

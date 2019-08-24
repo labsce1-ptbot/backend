@@ -6,6 +6,7 @@ const Slack = require("../models/slack-model");
 
 require("dotenv").config();
 
+// Dashboard from google hits
 module.exports = googleRoutes = {
   add_to_google: async event => {
     const { email, start_date, end_date, id } = event;
@@ -16,6 +17,7 @@ module.exports = googleRoutes = {
 
     const url = `https://www.googleapis.com/calendar/v3/calendars/${email}/events`;
 
+    // Get obj and auth from google, place on user in db
     let data = {
       end: {
         date: moment(end_date)
@@ -97,6 +99,8 @@ const refreshAccess = async (event, user) => {
     }
   });
 };
+
+
 // POST https://www.googleapis.com/calendar/v3/calendars/[CALENDARID]/events?key=[YOUR_API_KEY] HTTP/1.1
 
 // Authorization: Bearer[YOUR_ACCESS_TOKEN]

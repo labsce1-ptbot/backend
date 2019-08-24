@@ -28,7 +28,7 @@ module.exports = botkit => {
           res.send({ success: false });
           // res.status(200).json({ success: true, userInfo: user });
         });
-
+        // Get user info
         controller.webserver.get("/user/info", async (req, res) => {
           console.log("|--- Slack-info Endpoint---|\n", req.user);
           await User.findOne({
@@ -53,7 +53,7 @@ module.exports = botkit => {
 
         controller.webserver.get("/user/info/:id", async (req, res) => {
           const { id } = req.params;
-
+          // gets vacations for users, populate dashboard
           await User.findOne({
             _id: id
           })
@@ -70,7 +70,7 @@ module.exports = botkit => {
                 });
             });
         });
-
+        // adding a new vacation
         controller.webserver.post("/user/add/new", async (req, res) => {
           const { end_date, start_date, msg, email, id } = req.body;
           const googleObj = { end_date, start_date, email, id };
@@ -95,10 +95,10 @@ module.exports = botkit => {
                   userID: slackId,
                   teamID: team_id
                 };
-
+                // adds to database
                 db.add_date(newEvent);
               });
-            googleCal.add_to_google(googleObj);
+            googleCal.add_to_google(googleObj); 
             res.status(200).json({ savedEvent });
 
             // x = { ...req.body, slackId, team_id };
@@ -108,7 +108,7 @@ module.exports = botkit => {
             res.status(500).json({ message: err });
           }
         });
-
+        // delete vacation
         controller.webserver.delete("/user/delete/:id", async (req, res) => {
           try {
             const { id } = req.params;

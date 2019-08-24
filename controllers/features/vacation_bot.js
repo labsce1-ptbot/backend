@@ -24,6 +24,7 @@ module.exports = function(controller) {
   controller.on("block_actions", async (bot, message) => {
     console.log("<-- MESSAGE -->\n", message.incoming_message.channelData.user);
     console.log("<-- newDate -->\n", newDate);
+    // message comes in
     const {
       block_id,
       selected_date,
@@ -141,12 +142,13 @@ module.exports = function(controller) {
         ]
       });
     }
-
+    // starts/schedules vacation
     if (message.text === "schedule") {
       const new_message = `Hey <@${
         message.user
       }>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`;
       await bot.replyPrivate(message, {
+        // interactive_blocks
         blocks: block_helper.schedule_vacay(new_message)
       });
       console.log(message);
@@ -163,16 +165,16 @@ module.exports = function(controller) {
 
     const { user, channel, channel_type } = message;
     console.log("<--cache reg-->", cache[userRegex[0]]);
-
+    // look for user
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       console.log("<--cache reg-->", cache[userRegex[0]]);
-
+      // 
       if (cache[userRegex[0]].message.length > 0) {
         const { recipient, custom_message } = cache[userRegex[0]].message[0];
         if (recipient === channel && channel_type === "group") {
           {
             await bot.startPrivateConversation(user);
-            await bot.say(custom_message);
+            await bot.say(custom_message); // dm user
           }
         } else if (custom_message) {
           switch (recipient) {
@@ -221,6 +223,7 @@ module.exports = function(controller) {
   });
 
   // Deleting vacation from /slash all
+
   controller.on("block_actions", async (bot, message) => {
     const { text, value } = message.actions[0];
     if (text != undefined && text.text === "Delete") {
@@ -295,6 +298,7 @@ module.exports = function(controller) {
   });
 
   //dialog prompt for user to leave an away message
+  // pop-up
   controller.on("block_actions", async (bot, message) => {
     console.log("========message===============", message);
 

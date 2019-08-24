@@ -4,6 +4,7 @@ const Auth0Strategy = require("passport-auth0");
 const passport = require("passport");
 require("dotenv").config();
 
+// Google Auth
 module.exports = function(botkit) {
   return {
     // The name of the plugin. Used to log messages at boot time.
