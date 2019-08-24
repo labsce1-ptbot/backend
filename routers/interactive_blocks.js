@@ -109,5 +109,42 @@ module.exports = {
         ]
       }
     ];
+  },
+
+  help: () => {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            "I can help you with scheduling your vacations. Here's a quick overview of stuff I can do:"
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            ">>>*Schedule a Vacation*:\nType `/vacation schedule`\n A prompt will open to help you schedule your vacation. After you pick your dates, you are able to leave a custom message"
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            ">>>*View All/Delete Vacations*:\nType `/vacation all`\n Returns a list of all your vacations scheduled thought PTbOt. There will be delete buttons next to each vacation."
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            ">>>*Contact Us*:\nType For additional information please visit <https://ptbot.netlify.com|our site> or email us at: vacaybot1 at gmail dot com"
+        }
+      }
+    ];
   }
 };

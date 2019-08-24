@@ -161,6 +161,49 @@ module.exports = {
     return userAdd;
   },
 
+  testSlackAddUser: async profile => {
+    const { user, team, displayName } = profile;
+    let existingUser = await User.find({ email: user.email });
+    let slackUser = await Slack.find({
+      slackId: user.id,
+      team_id: team.id
+    });
+
+    //if user exists return user
+    if (existingUser.length > 0) {
+      return existingUser;
+    }
+    //create a new slack user
+    let newSlackUser = new Slack({
+      slackId: user.id,
+      team_id: team.id,
+      validated: true
+    });
+
+    //save to slack collection
+    let savedSlack;
+    if (slackUser.length === 0) {
+      savedSlack = await newSlackUser.save();
+    }
+
+    //create new user
+    let newUser = new User({
+      username: displayName,
+      first_name: user.name,
+      last_name: user.name,
+      email: user.email,
+      picture: user.image_72,
+      google_access_token: null,
+      google_refresh_token: null,
+      slack: [savedSlack._id]
+    });
+
+    //save user to db
+    let savedUser = await newUser.save();
+
+    return savedUser;
+  },
+
   save_vacation: async message => {},
 
   //runs every Sunday to clear out expired vacations

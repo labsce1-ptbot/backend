@@ -11,9 +11,10 @@ module.exports = botkit => {
     init: controller => {
       function userRoutes(req, res, next) {
         controller.webserver.get("/user/profile", async (req, res) => {
-          // console.log("he", res);
+          // console.log("he", req);
           let user;
           if (req.isAuthenticated()) {
+            console.log("he", req.user);
             try {
               user = req.user;
               console.log("|--User info---|", user);
