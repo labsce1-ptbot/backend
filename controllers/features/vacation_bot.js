@@ -143,9 +143,7 @@ module.exports = function(controller) {
     }
 
     if (message.text === "schedule") {
-      const new_message = `Hey <@${
-        message.user
-      }>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`;
+      const new_message = `Hey <@${message.user}>, let's get you set with the vacation date!\n\n\n\n\n\n\n*Please select the start and end date of your vacation time.*\n`;
       await bot.replyPrivate(message, {
         blocks: block_helper.schedule_vacay(new_message)
       });
@@ -162,10 +160,10 @@ module.exports = function(controller) {
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     const { user, channel, channel_type } = message;
-    console.log("<--cache reg-->", cache[userRegex[0]]);
+    // console.log("<--cache reg-->", cache[userRegex[0]]);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      console.log("<--cache reg-->", cache[userRegex[0]]);
+      // console.log("<--cache reg-->", cache[userRegex[0]]);
 
       if (cache[userRegex[0]].message.length > 0) {
         const { recipient, custom_message } = cache[userRegex[0]].message[0];
@@ -335,7 +333,11 @@ module.exports = function(controller) {
       ).notifyOnCancel(false);
       // console.log("====dialog===", blockId);
       // console.log("====dialog===", newDate);
-      await bot.replyWithDialog(message, dialog.asObject());
+      try {
+        await bot.replyWithDialog(message, dialog.asObject());
+      } catch (err) {
+        console.log(err);
+      }
     }
   });
 
