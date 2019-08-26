@@ -142,7 +142,7 @@ module.exports = {
         text: {
           type: "mrkdwn",
           text:
-            ">>>*Contact Us*:\nType For additional information please visit <https://ptbot.netlify.com|our site>"
+            ">>>*Contact Us*:\nType For additional information please visit <https://ptbot.netlify.com|our site> or email us at: vacaybot1 at gmail dot com"
         }
       }
     ];
