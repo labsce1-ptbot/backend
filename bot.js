@@ -118,7 +118,6 @@ controller.webserver.get("/install", (req, res) => {
 });
 
 controller.hears("hello", "message", async (bot, message) => {
-  console.log(Object.keys(userCache).length);
   await bot.reply(message, "yo!");
 });
 
@@ -126,15 +125,19 @@ controller.webserver.get("/install/auth", async (req, res) => {
   try {
     const results = await controller.adapter.validateOauthCode(req.query.code);
 
-    console.log("FULL OAUTH DETAILS", results);
+    if (results.user) {
+      console.log(results.user);
+    } else {
+      console.log("FULL OAUTH DETAILS", results);
 
-    // Store token by team in bot state.
-    tokenCache[results.team_id] = results.bot.bot_access_token;
+      // Store token by team in bot state.
+      tokenCache[results.team_id] = results.bot.bot_access_token;
 
-    // Capture team to bot id
-    userCache[results.team_id] = results.bot.bot_user_id;
-    let addedWorkspace = await db.newWorkspace(results);
-    res.json("Success! Bot installed.");
+      // Capture team to bot id
+      userCache[results.team_id] = results.bot.bot_user_id;
+      let addedWorkspace = await db.newWorkspace(results);
+      res.json("Success! Bot installed.");
+    }
   } catch (err) {
     console.error("OAUTH ERROR:", err);
     res.status(401);
@@ -183,3 +186,18 @@ async function getBotUserByTeam(teamId) {
     console.error("Team not found in userCache: ", err);
   }
 }
+
+// ERROR IN PLUGIN REGISTER Error: TypeError: app.use() requires a middleware function
+//   at Botkit.registerPlugin(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\node_modules\botkit\lib\core.js: 277: 27)
+// at Botkit.usePlugin(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\node_modules\botkit\lib\core.js: 243: 22)
+// at Botkit.controller.ready(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\bot.js: 94: 14)
+// at Botkit.signalBootComplete(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\node_modules\botkit\lib\core.js: 392: 21)
+// at Botkit.completeDep(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\node_modules\botkit\lib\core.js: 382: 14)
+// at Server.Botkit.http.listen(C: \Users\Brian\Desktop\git\jobs\PTbOt\backend\node_modules\botkit\lib\core.js: 149: 26)
+// at Object.onceWrapper(events.js: 277: 13)
+// at Server.emit(events.js: 189: 13)
+// at emitListeningNT(net.js: 1304: 10)
+// at process._tickCallback(internal / process / next_tick.js: 63: 19)
+// at Function.Module.runMain(internal / modules / cjs / loader.js: 757: 11)
+// at startup(internal / bootstrap / node.js: 283: 19)
+// at bootstrapNodeJSCore(internal / bootstrap / node.js: 622: 3)
