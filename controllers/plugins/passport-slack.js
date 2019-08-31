@@ -12,7 +12,8 @@ module.exports = botkit => {
             {
               clientID: process.env.clientId,
               clientSecret: process.env.clientSecret,
-              scope: ["identity.basic", "identity.email", "identity.avatar"]
+              scope: ["identity.basic", "identity.email", "identity.avatar"],
+              callbackURL: `http://localhost:3000/test/slack/callback`
             },
             async (accessToken, refreshToken, profile, done) => {
               let user;
@@ -39,27 +40,14 @@ module.exports = botkit => {
 
         controller.webserver.get(
           "/test/slack/callback",
-          passport.authenticate(
-            "Slack",
-            {
-              successRedirect: "/test/success",
-              failureRedirect: "/test/failure"
-            }
-            // () => console.log("Yo!")
-          )
-        );
-
-        controller.webserver.get("/test/failure", (req, res) => {
-          res.send("Failed Login");
-        });
-
-        controller.webserver.get(
-          "/test/success",
-          passport.authenticate("Slack"),
+          passport.authenticate("Slack", { failureRedirect: "/" }),
           (req, res) => {
-            res.redirect(`${process.env.SLACK_REDIRECT}/admin/user`);
+            res.redirect("http://localhost:3001/admin/dashboard");
           }
         );
+
+        console.log("REQ: ", req.url);
+
         next();
       }
       controller.webserver.use("/test", testRoutes);
