@@ -1,6 +1,7 @@
 const Event = require("../models/event-model");
 const User = require("../models/user-model");
 const Slack = require("../models/slack-model");
+const Workspace = require("../models/workspace-model");
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
 const moment = require("moment");
@@ -164,7 +165,7 @@ module.exports = {
   testSlackAddUser: async profile => {
     const { user, team, displayName } = profile;
     let existingUser = await User.find({ email: user.email });
-    let slackUser = await Slack.find({
+    let slackUser = await Slack.findOne({
       slackId: user.id,
       team_id: team.id
     });
@@ -184,8 +185,11 @@ module.exports = {
     let savedSlack;
     if (slackUser.length === 0) {
       savedSlack = await newSlackUser.save();
+    } else {
+      savedSlack = slackUser._id;
     }
 
+    console.log("-------saved slack", slackUser);
     //create new user
     let newUser = new User({
       username: displayName,
@@ -195,7 +199,7 @@ module.exports = {
       picture: user.image_72,
       google_access_token: null,
       google_refresh_token: null,
-      slack: [savedSlack._id]
+      slack: [savedSlack._id || slackUser]
     });
 
     //save user to db
@@ -271,8 +275,33 @@ module.exports = {
       google_refresh_token: refresh
     });
     await findUser.save();
-  }
+  },
 
+  newWorkspace: async botInfo => {
+    let newWork = new Workspace({
+      access_token: botInfo.access_token,
+      scope: botInfo.scope,
+      user_id: botInfo.user_id,
+      team_name: botInfo.team_name,
+      team_id: botInfo.team_id,
+      enterprise_id: botInfo.enterprise_id,
+      bot_user_id: botInfo.bot.bot_user_id,
+      bot_access_token: botInfo.bot.bot_access_token
+    });
+
+    //save user to db
+    let savedUser = await newWork.save();
+    return savedUser;
+  },
+
+  getWorkspaceTeamID: async team_id => {
+    try {
+      let work = await Workspace.findOne({ team_id: team_id });
+      return work;
+    } catch (err) {
+      console.log(err);
+    }
+  }
   // refreshAccessToken: async (event, user) => {
   //   let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${
   //     user.google_refresh_token
