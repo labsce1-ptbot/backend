@@ -13,7 +13,7 @@ module.exports = botkit => {
               clientID: process.env.clientId,
               clientSecret: process.env.clientSecret,
               scope: ["identity.basic", "identity.email", "identity.avatar"],
-              callbackURL: `http://localhost:3000/test/slack/callback`
+              callbackURL: `${process.env.AUTH_REDIRECT}/test/slack/callback`
             },
             async (accessToken, refreshToken, profile, done) => {
               let user;
@@ -42,7 +42,7 @@ module.exports = botkit => {
           "/test/slack/callback",
           passport.authenticate("Slack", { failureRedirect: "/" }),
           (req, res) => {
-            res.redirect("http://localhost:3001/admin/dashboard");
+            res.redirect(`${SLACK_REDIRECT}/admin/dashboard`);
           }
         );
 

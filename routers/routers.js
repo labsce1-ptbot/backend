@@ -289,9 +289,13 @@ module.exports = {
       bot_access_token: botInfo.bot.bot_access_token
     });
 
-    //save user to db
-    let savedUser = await newWork.save();
-    return savedUser;
+    try {
+      //save user to db
+      let savedUser = await newWork.save();
+      return savedUser;
+    } catch (err) {
+      console.log(err);
+    }
   },
 
   getWorkspaceTeamID: async team_id => {
