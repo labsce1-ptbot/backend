@@ -17,9 +17,11 @@ module.exports = function(botkit) {
               domain: process.env.AUTH0_DOMAIN,
               clientID: process.env.AUTH0_CLIENT_ID,
               clientSecret: process.env.AUTH0_CLIENT_SECRET,
-              callbackURL: process.env.AUTH0_CALLBACK_URL
+              callbackURL: process.env.AUTH0_CALLBACK_URL,
+              scope: "openid email profile team"
             },
             async (accessToken, refreshToken, extraParams, profile, done) => {
+              console.log("\n\nprofile---->\n\n", profile);
               let user;
               profile.accessToken = accessToken;
               profile.refreshToken = refreshToken;
@@ -27,7 +29,17 @@ module.exports = function(botkit) {
               profile.expires = moment().add(profile.expiresIn, "s");
               console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
               try {
-                user = await User.addUser(profile._json);
+                if (profile.user_id.split("|")[1] === "slack") {
+                  const { _json, user_id } = profile;
+                  _json["slack_id"] = user_id.split("|")[2];
+                  _json["team_id"] =
+                    _json[`${process.env.AUTH0_PROFILE_TEAM}`].id;
+                  _json["image"] =
+                    _json[`${process.env.AUTH0_PROFILE_TEAM}`].image_44;
+                  user = await User.slackAddUser(_json);
+                } else {
+                  user = await User.addUser(profile._json);
+                }
                 return done(null, user);
               } catch (err) {
                 return done(err, null);
@@ -75,7 +87,7 @@ module.exports = function(botkit) {
         });
 
         // log the requested url. handy for debugging!
-        console.log("REQ: ", req.url);
+        console.log("REQ A: ", req.url);
 
         // call next or else the request will be intercepted
         next();
