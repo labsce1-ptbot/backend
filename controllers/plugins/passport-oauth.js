@@ -3,7 +3,7 @@ const User = require("../../routers/routers");
 const Auth0Strategy = require("passport-auth0");
 const passport = require("passport");
 require("dotenv").config();
-
+// https://ptbot.auth0.com/v2/logout
 module.exports = function(botkit) {
   return {
     // The name of the plugin. Used to log messages at boot time.
@@ -21,13 +21,12 @@ module.exports = function(botkit) {
               scope: "openid email profile team"
             },
             async (accessToken, refreshToken, extraParams, profile, done) => {
-              console.log("\n\nprofile---->\n\n", profile);
               let user;
               profile.accessToken = accessToken;
               profile.refreshToken = refreshToken;
               profile.expiresIn = extraParams.expires_in;
               profile.expires = moment().add(profile.expiresIn, "s");
-              console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
+              // console.log("<------=-=-=-= PROFILE =-=-=-=-=-=---->\n", profile);
               try {
                 if (profile.user_id.split("|")[1] === "slack") {
                   const { _json, user_id } = profile;
