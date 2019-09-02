@@ -136,6 +136,7 @@ controller.webserver.get("/install/auth", async (req, res) => {
       // Capture team to bot id
       userCache[results.team_id] = results.bot.bot_user_id;
       let addedWorkspace = await db.newWorkspace(results);
+      // res.redirect(`${process.env.ORIGIN}`);
       res.json("Success! Bot installed.");
     }
   } catch (err) {
