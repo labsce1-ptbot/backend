@@ -31,7 +31,7 @@ module.exports = botkit => {
         });
 
         controller.webserver.get("/user/info", async (req, res) => {
-          console.log("|--- Slack-info Endpoint---|\n", req.user);
+          // console.log("|--- Slack-info Endpoint---|\n", req.user);
           await User.findOne({
             email: req.user[0].email
           })
