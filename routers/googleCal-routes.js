@@ -40,13 +40,9 @@ module.exports = googleRoutes = {
 
     if (user.google_access_token !== null) {
       request.post(options, (err, httpResonse, body) => {
-        console.log("body--gCal------------\n>", body);
         if (body.error) {
           refreshAccess(event, user);
         }
-
-        // console.log("err--gCal--------------------\n>", err);
-        // console.log("http--gCal--------------\n>", httpResonse);
       });
     }
   },
@@ -82,11 +78,7 @@ module.exports = googleRoutes = {
 };
 
 const refreshAccess = async (event, user) => {
-  let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${
-    user.google_refresh_token
-  }&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${
-    process.env.GOOGLE_CLIENT_SECRET
-  }&grant_type=refresh_token`;
+  let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${user.google_refresh_token}&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${process.env.GOOGLE_CLIENT_SECRET}&grant_type=refresh_token`;
   await request.post(url, async (err, httpResponse, body) => {
     let data = JSON.parse(body);
 
@@ -94,23 +86,8 @@ const refreshAccess = async (event, user) => {
       { _id: user._id },
       { google_access_token: data.access_token }
     );
-    console.log("----->------", updatedUser);
     if (updatedUser.n === 1) {
       googleRoutes.add_to_google(event);
     }
   });
 };
-// POST https://www.googleapis.com/calendar/v3/calendars/[CALENDARID]/events?key=[YOUR_API_KEY] HTTP/1.1
-
-// Authorization: Bearer[YOUR_ACCESS_TOKEN]
-// Accept: application / json
-// Content - Type: application / json
-
-// {
-//     "end": {
-//         "date": "2019-07-07"
-//     },
-//     "start": {
-//         "date": "2019-06-06"
-//     }
-// }

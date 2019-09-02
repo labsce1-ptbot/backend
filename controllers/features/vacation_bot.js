@@ -16,14 +16,11 @@ module.exports = function(controller) {
   let blockId;
 
   controller.hears("here", async (bot, message) => {
-    console.log("====here====", message);
     await bot.replyPrivate(message, `I see you <@${message.user}>`);
   });
 
   // Response to (any) block actions (in this case) after calling slash commands
   controller.on("block_actions", async (bot, message) => {
-    console.log("<-- MESSAGE -->\n", message.incoming_message.channelData.user);
-    console.log("<-- newDate -->\n", newDate);
     const {
       block_id,
       selected_date,
@@ -97,7 +94,7 @@ module.exports = function(controller) {
     // Temporarily solution to immediately pull data and save to cache.js
     if (message.incoming_message.channelData.actions[0].value === "finding") {
       const find = await db.get_date();
-      console.log(find);
+
       find.forEach(obj => {
         cache[obj.slackID] = {
           start_date: obj.startDate,
@@ -105,7 +102,7 @@ module.exports = function(controller) {
           message: obj.message
         };
       });
-      console.log("<----What's in cache?!?------>\n", cache);
+
       // await bot.replyPublic(message, `${cache}`);
     }
   });
@@ -147,7 +144,6 @@ module.exports = function(controller) {
       await bot.replyPrivate(message, {
         blocks: block_helper.schedule_vacay(new_message)
       });
-      console.log(message);
     }
 
     // set http status
@@ -156,7 +152,6 @@ module.exports = function(controller) {
 
   // Provide response if someone mention a user that is on vacation.
   controller.on("message", async (bot, message) => {
-    console.log("<-=-=-=-=-=-=MESSSAAAGE=-=-=-=-=-=-=->\n", message);
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     const { user, channel, channel_type } = message;
@@ -294,8 +289,6 @@ module.exports = function(controller) {
 
   //dialog prompt for user to leave an away message
   controller.on("block_actions", async (bot, message) => {
-    console.log("========blocks===============", message);
-
     if (message.actions[0].value === "Custom Message") {
       let dialog = new SlackDialog(
         "Leave a Custom Message?",
@@ -309,19 +302,6 @@ module.exports = function(controller) {
             max_length: 250,
             optional: true
           },
-
-          // {
-          //   label: "Limit who receives custom message (channels)",
-          //   name: "channel",
-          //   type: "select",
-          //   data_source: "channels"
-          // },
-          // {
-          //   label: "Limit who receives custom message (users)",
-          //   name: "users",
-          //   type: "select",
-          //   data_source: "users"
-          // }
           {
             label: "Limit who receives custom message",
             name: "conversations",
@@ -331,8 +311,6 @@ module.exports = function(controller) {
           }
         ]
       ).notifyOnCancel(false);
-      // console.log("====dialog===", blockId);
-      // console.log("====dialog===", newDate);
       try {
         await bot.replyWithDialog(message, dialog.asObject());
       } catch (err) {
@@ -344,17 +322,12 @@ module.exports = function(controller) {
   //dialog submission and save to database
   controller.on("dialog_submission", async (bot, message) => {
     const { conversations, text } = message.submission;
-    console.log("==========bot======", message.team.id);
     newDate[blockId] = {
       ...newDate[blockId],
       teamID: message.team.id,
       msg_for: conversations,
       msg: text
     };
-
-    console.log("====dialog===", blockId);
-
-    console.log("====dialog===", newDate);
     try {
       if (
         newDate[blockId].start_date === "" ||
@@ -383,7 +356,6 @@ module.exports = function(controller) {
         if ((dbResponse.slackID = message.user)) {
           await bot.replyPrivate(message, "Your Vacation has been scheduled!");
           delete newDate[blockId];
-          console.log(newDate[blockId]);
         } else {
           await bot.replyPrivate(message, "Vacation denied!");
         }
@@ -395,7 +367,6 @@ module.exports = function(controller) {
   });
 
   controller.on("slash_command", async (bot, message) => {
-    console.log("----mesage help---->", message);
     if (message.text === "help") {
       await bot.replyPrivate(message, { blocks: block_helper.help() });
     }

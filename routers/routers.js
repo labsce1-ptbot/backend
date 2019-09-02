@@ -1,6 +1,7 @@
 const Event = require("../models/event-model");
 const User = require("../models/user-model");
 const Slack = require("../models/slack-model");
+const Workspace = require("../models/workspace-model");
 const db = require("../config/db");
 const Messages = require("../models/messages-model");
 const moment = require("moment");
@@ -164,7 +165,7 @@ module.exports = {
   testSlackAddUser: async profile => {
     const { user, team, displayName } = profile;
     let existingUser = await User.find({ email: user.email });
-    let slackUser = await Slack.find({
+    let slackUser = await Slack.findOne({
       slackId: user.id,
       team_id: team.id
     });
@@ -184,8 +185,11 @@ module.exports = {
     let savedSlack;
     if (slackUser.length === 0) {
       savedSlack = await newSlackUser.save();
+    } else {
+      savedSlack = slackUser._id;
     }
 
+    console.log("-------saved slack", slackUser);
     //create new user
     let newUser = new User({
       username: displayName,
@@ -195,7 +199,7 @@ module.exports = {
       picture: user.image_72,
       google_access_token: null,
       google_refresh_token: null,
-      slack: [savedSlack._id]
+      slack: [savedSlack._id || slackUser]
     });
 
     //save user to db
@@ -271,25 +275,81 @@ module.exports = {
       google_refresh_token: refresh
     });
     await findUser.save();
+  },
+
+  newWorkspace: async botInfo => {
+    let newWork = new Workspace({
+      access_token: botInfo.access_token,
+      scope: botInfo.scope,
+      user_id: botInfo.user_id,
+      team_name: botInfo.team_name,
+      team_id: botInfo.team_id,
+      enterprise_id: botInfo.enterprise_id,
+      bot_user_id: botInfo.bot.bot_user_id,
+      bot_access_token: botInfo.bot.bot_access_token
+    });
+
+    try {
+      //save user to db
+      let savedUser = await newWork.save();
+      return savedUser;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  getWorkspaceTeamID: async team_id => {
+    try {
+      let work = await Workspace.findOne({ team_id: team_id });
+      return work;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  slackAddUser: async profile => {
+    const { email, name, team_id, slack_id, image, nickname } = profile;
+    let existingUser = await User.find({ email: email });
+    let slackUser = await Slack.findOne({
+      slackId: slack_id,
+      team_id: team_id
+    });
+
+    //if user exists return user
+    if (existingUser.length > 0) {
+      return existingUser;
+    }
+    //create a new slack user
+    let newSlackUser = new Slack({
+      slackId: slack_id,
+      team_id: team_id,
+      validated: true
+    });
+
+    //save to slack collection
+    let savedSlack;
+    if (slackUser.length === 0) {
+      savedSlack = await newSlackUser.save();
+    } else {
+      savedSlack = slackUser;
+
+      console.log("-------saved slack", slackUser);
+      //create new user
+      let newUser = new User({
+        username: nickname,
+        first_name: name,
+        last_name: name,
+        email: email,
+        picture: image,
+        google_access_token: null,
+        google_refresh_token: null,
+        slack: savedSlack._id
+      });
+
+      //save user to db
+      let savedUser = await newUser.save();
+
+      return savedUser;
+    }
   }
-
-  // refreshAccessToken: async (event, user) => {
-  //   let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${
-  //     user.google_refresh_token
-  //   }&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${
-  //     process.env.GOOGLE_CLIENT_SECRET
-  //   }&grant_type=refresh_token`;
-  //   await request.post(url, async (err, httpResponse, body) => {
-  //     let data = JSON.parse(body);
-
-  //     const userToken = await User.updateOne(
-  //       { _id: user._id },
-  //       { google_access_token: data.access_token }
-  //     );
-
-  //     if (userToken.n === 1) {
-  //       google.add_to_google(event);
-  //     }
-  //   });
-  // }
 };
