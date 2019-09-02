@@ -305,24 +305,51 @@ module.exports = {
     } catch (err) {
       console.log(err);
     }
+  },
+
+  slackAddUser: async profile => {
+    const { email, name, team_id, slack_id, image, nickname } = profile;
+    let existingUser = await User.find({ email: email });
+    let slackUser = await Slack.findOne({
+      slackId: slack_id,
+      team_id: team_id
+    });
+
+    //if user exists return user
+    if (existingUser.length > 0) {
+      return existingUser;
+    }
+    //create a new slack user
+    let newSlackUser = new Slack({
+      slackId: slack_id,
+      team_id: team_id,
+      validated: true
+    });
+
+    //save to slack collection
+    let savedSlack;
+    if (slackUser.length === 0) {
+      savedSlack = await newSlackUser.save();
+    } else {
+      savedSlack = slackUser;
+
+      console.log("-------saved slack", slackUser);
+      //create new user
+      let newUser = new User({
+        username: nickname,
+        first_name: name,
+        last_name: name,
+        email: email,
+        picture: image,
+        google_access_token: null,
+        google_refresh_token: null,
+        slack: savedSlack._id
+      });
+
+      //save user to db
+      let savedUser = await newUser.save();
+
+      return savedUser;
+    }
   }
-  // refreshAccessToken: async (event, user) => {
-  //   let url = `https://www.googleapis.com/oauth2/v4/token?refresh_token=${
-  //     user.google_refresh_token
-  //   }&client_id=${process.env.GOOGLE_CLIENT_ID}&client_secret=${
-  //     process.env.GOOGLE_CLIENT_SECRET
-  //   }&grant_type=refresh_token`;
-  //   await request.post(url, async (err, httpResponse, body) => {
-  //     let data = JSON.parse(body);
-
-  //     const userToken = await User.updateOne(
-  //       { _id: user._id },
-  //       { google_access_token: data.access_token }
-  //     );
-
-  //     if (userToken.n === 1) {
-  //       google.add_to_google(event);
-  //     }
-  //   });
-  // }
 };

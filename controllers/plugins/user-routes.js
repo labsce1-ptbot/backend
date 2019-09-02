@@ -19,7 +19,7 @@ module.exports = botkit => {
               user = req.user;
               console.log("|--User info---|", user);
               // console.log("<-=-=-=-=- req.user =-=-=-=-=->\n", req);
-              console.log("<-=-=-=-=- Success! =-=-=-=->\n");
+              // console.log("<-=-=-=-=- Success! =-=-=-=->\n");
               res.send({ success: true, userInfo: user });
             } catch (err) {
               res.send({ success: false });
@@ -36,8 +36,8 @@ module.exports = botkit => {
           })
             .populate("slack")
             .exec(async (err, info) => {
-              console.log("Slack Info:\n", info);
-              console.log("|---Access---|\n", info.slack[0].team_id);
+              // console.log("Slack Info:\n", info);
+              // console.log("|---Access---|\n", info.slack[0].team_id);
 
               await Event.find({
                 teamID: info.slack[0].team_id,
@@ -45,7 +45,7 @@ module.exports = botkit => {
               })
                 .populate("message")
                 .exec((err, event) => {
-                  console.log("|---Event Info---|\n", event);
+                  // console.log("|---Event Info---|\n", event);
                   res.send(event);
                 });
             });
@@ -74,11 +74,11 @@ module.exports = botkit => {
         controller.webserver.post("/user/add/new", async (req, res) => {
           const { end_date, start_date, msg, email, id } = req.body;
           const googleObj = { end_date, start_date, email, id };
-          console.log("---body---", req.body);
+          // console.log("---body---", req.body);
           let user;
           if (req.isAuthenticated()) {
             user = req.session.passport.user;
-            console.log("|---User info in Post add Event|\n", user);
+            // console.log("|---User info in Post add Event|\n", user);
           }
 
           try {
