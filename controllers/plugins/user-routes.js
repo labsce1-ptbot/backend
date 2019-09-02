@@ -24,9 +24,10 @@ module.exports = botkit => {
             } catch (err) {
               res.send({ success: false });
             }
+          } else {
+            res.send({ success: false });
+            // res.status(200).json({ success: true, userInfo: user });
           }
-          res.send({ success: false });
-          // res.status(200).json({ success: true, userInfo: user });
         });
 
         controller.webserver.get("/user/info", async (req, res) => {
