@@ -160,8 +160,8 @@ module.exports = function(controller) {
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       // console.log("<--cache reg-->", cache[userRegex[0]]);
 
-      if (cache[userRegex[0]].message.length > 0) {
-        const { recipient, custom_message } = cache[userRegex[0]].message[0];
+      if (cache[userRegex[0]].message !== undefined) {
+        const { recipient, custom_message } = cache[userRegex[0]].message;
         if (recipient === channel && channel_type === "group") {
           {
             await bot.startPrivateConversation(user);
@@ -173,7 +173,6 @@ module.exports = function(controller) {
               await bot.startPrivateConversation(user);
               await bot.say(custom_message);
               break;
-
             case channel:
               await bot.replyInThread(message, custom_message);
               break;
