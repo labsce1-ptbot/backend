@@ -14,13 +14,17 @@ let db = require("./routers/routers");
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
 // let authSlack = require("./controllers/plugins/slack-auth");
-let session = require("./controllers/plugins/session");
+// let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/user-routes");
 let googleCal = require("./controllers/plugins/googlecal");
 let testSlack = require("./controllers/plugins/passport-slack");
-
 // Import a platform-specific adapter for slack.
-
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const passport = require("passport");
+const session = require("express-session");
+const bodyParser = require("body-parser");
 const {
   SlackAdapter,
   SlackMessageTypeMiddleware,
@@ -91,13 +95,34 @@ controller.ready(() => {
   controller.loadModules(__dirname + "/controllers/features");
 
   // loading in custom plugins
-  controller.usePlugin(session);
+  // controller.usePlugin(session);
   controller.usePlugin(server);
   controller.usePlugin(passportOAuth);
   controller.usePlugin(userRoutes);
   // controller.usePlugin(authSlack);
   controller.usePlugin(googleCal);
   controller.usePlugin(testSlack);
+  controller.webserver.use(
+    express.json(),
+    cors({
+      origin: process.env.ORIGIN,
+      credentials: true
+    }),
+    helmet(),
+    session({
+      secret: process.env.secret,
+      saveUninitialized: false,
+      resave: false
+    }),
+    bodyParser.urlencoded({
+      limit: "50mb",
+      extended: true,
+      parameterLimit: 50000
+    }),
+    bodyParser.json({ limit: "50mb", extended: true }),
+    passport.initialize(),
+    passport.session()
+  );
 
   /* catch-all that uses the CMS to trigger dialogs */
   if (controller.plugins.cms) {

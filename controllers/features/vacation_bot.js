@@ -155,14 +155,15 @@ module.exports = function(controller) {
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     const { user, channel, channel_type } = message;
-    // console.log("<--cache reg-->", cache[userRegex[0]]);
+    console.log("<--cache reg-->", message);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       // console.log("<--cache reg-->", cache[userRegex[0]]);
 
-      if (cache[userRegex[0]].message.length > 0) {
-        const { recipient, custom_message } = cache[userRegex[0]].message[0];
-        if (recipient === channel && channel_type === "group") {
+      if (cache[userRegex[0]].message !== undefined) {
+        const { recipient, custom_message } = cache[userRegex[0]].message;
+        if (recipient === channel || channel_type === "group") {
+          console.log("hi");
           {
             await bot.startPrivateConversation(user);
             await bot.say(custom_message);
@@ -173,7 +174,6 @@ module.exports = function(controller) {
               await bot.startPrivateConversation(user);
               await bot.say(custom_message);
               break;
-
             case channel:
               await bot.replyInThread(message, custom_message);
               break;

@@ -89,19 +89,21 @@ cron.schedule(
   }
 );
 
-cron.schedule("30 00 * * *", async () => {
-  console.log("-------------------------\n");
+cron.schedule("30 00 00 * * *", async () => {
   console.log("Collecting data from database and saving to cache.js\n");
   const database = await db.get_date();
+  // console.log("---->----db cache---->", database);
   database.forEach(obj => {
     (cache[obj.slackID] = {
       start_date: obj.startDate,
       end_date: obj.endDate,
       message: obj.message[0],
-      vacation: true
+      vacation: true,
+      team: obj.teamID
     }),
       {
-        scheduled: true
+        scheduled: true,
+        timezone: "America/New_York"
       };
   });
   // console.log("------------------------\n");
