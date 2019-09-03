@@ -89,7 +89,7 @@ cron.schedule(
   }
 );
 
-cron.schedule("30 00 00 * * *", async () => {
+cron.schedule("30 11 * * * *", async () => {
   console.log("Collecting data from database and saving to cache.js\n");
   const database = await db.get_date();
   // console.log("---->----db cache---->", database);
