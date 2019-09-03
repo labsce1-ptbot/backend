@@ -155,7 +155,7 @@ module.exports = function(controller) {
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     const { user, channel, channel_type } = message;
-    console.log("<--cache reg-->", message);
+    // console.log("<--cache reg-->", message);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
       // console.log("<--cache reg-->", cache[userRegex[0]]);
