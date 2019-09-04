@@ -1,9 +1,3 @@
-//  __   __  ___        ___
-// |__) /  \  |  |__/ |  |
-// |__) \__/  |  |  \ |  |
-
-// This is the main file for the PTbOt bot.
-
 // Import Botkit's core features
 const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
@@ -13,8 +7,6 @@ let db = require("./routers/routers");
 // Importing custom plugins
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
-// let authSlack = require("./controllers/plugins/slack-auth");
-// let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/user-routes");
 let googleCal = require("./controllers/plugins/googlecal");
 let testSlack = require("./controllers/plugins/passport-slack");
