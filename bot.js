@@ -1,9 +1,3 @@
-//  __   __  ___        ___
-// |__) /  \  |  |__/ |  |
-// |__) \__/  |  |  \ |  |
-
-// This is the main file for the PTbOt bot.
-
 // Import Botkit's core features
 const { Botkit } = require("botkit");
 const { BotkitCMSHelper } = require("botkit-plugin-cms");
@@ -13,8 +7,6 @@ let db = require("./routers/routers");
 // Importing custom plugins
 let server = require("./controllers/plugins/server");
 let passportOAuth = require("./controllers/plugins/passport-oauth");
-// let authSlack = require("./controllers/plugins/slack-auth");
-// let session = require("./controllers/plugins/session");
 let userRoutes = require("./controllers/plugins/user-routes");
 let googleCal = require("./controllers/plugins/googlecal");
 let testSlack = require("./controllers/plugins/passport-slack");
@@ -50,19 +42,12 @@ const adapter = new SlackAdapter({
   verificationToken: process.env.verificationToken,
   clientSigningSecret: process.env.clientSigningSecret,
 
-  // auth token for a single-team app
-  // botToken: process.env.botToken,
-
   // credentials used to set up oauth for multi-team apps
   clientId: process.env.clientId,
   clientSecret: process.env.clientSecret,
   scopes: ["bot"],
-  // redirectUri: process.env.redirectUri,
   debug: true,
   redirectUri: `${process.env.AUTH_REDIRECT}/install/auth`,
-  // functions required for retrieving team-specific info
-  // for use in multi-team apps
-
   getBotUserByTeam: getBotUserByTeam,
   getTokenForTeam: getTokenForTeam
 });
@@ -150,20 +135,16 @@ controller.webserver.get("/install/auth", async (req, res) => {
   try {
     const results = await controller.adapter.validateOauthCode(req.query.code);
 
-    if (results.user) {
-      console.log(results.user);
-    } else {
-      console.log("FULL OAUTH DETAILS", results);
+    console.log("FULL OAUTH DETAILS", results);
 
-      // Store token by team in bot state.
-      tokenCache[results.team_id] = results.bot.bot_access_token;
+    // Store token by team in bot state.
+    tokenCache[results.team_id] = results.bot.bot_access_token;
 
-      // Capture team to bot id
-      userCache[results.team_id] = results.bot.bot_user_id;
-      let addedWorkspace = await db.newWorkspace(results);
-      // res.redirect(`${process.env.ORIGIN}`);
-      res.json("Success! Bot installed.");
-    }
+    // Capture team to bot id
+    userCache[results.team_id] = results.bot.bot_user_id;
+    let addedWorkspace = await db.newWorkspace(results);
+    res.redirect(`https://app.slack.com/client/${results.team_id}`);
+    // res.json("Success! Bot installed.");
   } catch (err) {
     console.error("OAUTH ERROR:", err);
     res.status(401);
