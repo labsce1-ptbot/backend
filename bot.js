@@ -161,8 +161,8 @@ controller.webserver.get("/install/auth", async (req, res) => {
       // Capture team to bot id
       userCache[results.team_id] = results.bot.bot_user_id;
       let addedWorkspace = await db.newWorkspace(results);
-      // res.redirect(`${process.env.ORIGIN}`);
-      res.json("Success! Bot installed.");
+      res.redirect(`https://app.slack.com/client/${results.team_id}`);
+      // res.json("Success! Bot installed.");
     }
   } catch (err) {
     console.error("OAUTH ERROR:", err);
