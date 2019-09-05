@@ -161,7 +161,7 @@ module.exports = function(controller) {
         cache[userRegex[0]].message !== undefined &&
         cache[userRegex[0]].message.length > 0
       ) {
-        const { recipient, custom_message } = cache[userRegex[0]].message;
+        const { recipient, custom_message } = cache[userRegex[0]].message[0];
         if (recipient === channel || channel_type === "group") {
           {
             await bot.startPrivateConversation(user);
