@@ -2,7 +2,6 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-
 var cache = require("../../models/cache");
 let db = require("../../routers/routers");
 let moment = require("moment");
@@ -155,15 +154,15 @@ module.exports = function(controller) {
     const userRegex = /(U|W)(.){8}/.exec(`${message.text}`);
 
     const { user, channel, channel_type } = message;
-    // console.log("<--cache reg-->", message);
+    // console.log("<--cache reg-->", cache[`${userRegex[0]}`]);
 
     if (userRegex !== null && cache[`${userRegex[0]}`] !== undefined) {
-      // console.log("<--cache reg-->", cache[userRegex[0]]);
-
-      if (cache[userRegex[0]].message !== undefined) {
+      if (
+        cache[userRegex[0]].message !== undefined &&
+        cache[userRegex[0]].message.length > 0
+      ) {
         const { recipient, custom_message } = cache[userRegex[0]].message;
         if (recipient === channel || channel_type === "group") {
-          console.log("hi");
           {
             await bot.startPrivateConversation(user);
             await bot.say(custom_message);
