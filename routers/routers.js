@@ -326,7 +326,7 @@ module.exports = {
 
     //save to slack collection
     let savedSlack;
-    if (slackUser.length === 0) {
+    if (!slackUser) {
       savedSlack = await newSlackUser.save();
     } else {
       savedSlack = slackUser;
